@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Productive X - Workspace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- CDNs for Overhaul -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background-color: var(--card-bg);
+      border-right: 1px solid var(--card-border);
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      transition: var(--transition);
+    }
+    .sidebar-header {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .nav-item {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: var(--text-muted);
+      transition: var(--transition);
+      font-weight: 500;
+    }
+    .nav-item:hover, .nav-item.active {
+      background-color: rgba(37, 99, 235, 0.1);
+      color: var(--primary-color);
+    }
+    .nav-bottom {
+      margin-top: auto;
+    }
+
+    /* Navbar */
+    .navbar {
+      height: var(--navbar-height);
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: var(--sidebar-width);
+      background-color: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 90;
+      transition: var(--transition);
+    }
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: white;
+    }
+
+    /* Module Container */
+    .module-section {
+      display: none;
+      animation: fadeIn 0.3s ease forwards;
+    }
+    .module-section.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Mobile toggle */
+    .mobile-toggle {
+      display: none;
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+    @media (max-width: 768px) {
+      .mobile-toggle { display: block; }
+      .navbar { left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="toast-container" class="toast-container"></div>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <i class="fa-solid fa-bolt"></i> Productive X
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-item active" data-target="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</div>
+        <div class="nav-item" data-target="tasks"><i class="fa-solid fa-list-check"></i> Tasks</div>
+        <div class="nav-item" data-target="expenses"><i class="fa-solid fa-wallet"></i> Expenses</div>
+        <div class="nav-item" data-target="goals"><i class="fa-solid fa-bullseye"></i> Goals</div>
+        <div class="nav-item" data-target="habits"><i class="fa-solid fa-calendar-check"></i> Habits</div>
+        <div class="nav-item" data-target="notes"><i class="fa-solid fa-sticky-note"></i> Notes</div>
+        <div class="nav-item" data-target="pomodoro"><i class="fa-solid fa-clock"></i> Pomodoro</div>
+      </nav>
+      <div class="nav-bottom">
+        <div class="nav-item" data-target="settings"><i class="fa-solid fa-gear"></i> Settings</div>
+        <div class="nav-item text-danger" id="logout-btn" style="color: var(--danger-color)"><i class="fa-solid fa-right-from-bracket"></i> Logout</div>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <!-- Navbar -->
+      <header class="navbar">
+        <div class="mobile-toggle" id="mobile-toggle"><i class="fa-solid fa-bars"></i></div>
+        <h2 id="page-title">Dashboard</h2>
+        <div class="user-profile">
+          <span id="user-name-display">User Name</span>
+          <div class="avatar" id="user-avatar">U</div>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <main class="content-area">
+        <!-- Dashboard Module -->
+        <section id="module-dashboard" class="module-section active">
+          <!-- Will be populated by JS -->
+          <div class="grid grid-cols-4 gap-4" style="margin-bottom: 2rem;">
+            <div class="card glass text-center">
+              <h3 style="color: var(--text-muted)">Pending Tasks</h3>
+              <h1 id="dash-pending-tasks">0</h1>
+            </div>
+            <div class="card glass text-center">
+              <h3 style="color: var(--text-muted)">Balance</h3>
+              <h1 id="dash-balance">$0</h1>
+            </div>
+            <div class="card glass text-center">
+              <h3 style="color: var(--text-muted)">Active Goals</h3>
+              <h1 id="dash-active-goals">0</h1>
+            </div>
+            <div class="card glass text-center">
+              <h3 style="color: var(--text-muted)">Habits Tracked</h3>
+              <h1 id="dash-habits-tracked">0</h1>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="card glass">
+              <h3>Task Completion</h3>
+              <canvas id="taskChart"></canvas>
+            </div>
+            <div class="card glass">
+              <h3>Expense Distribution</h3>
+              <canvas id="expenseChart"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- Task Module -->
+        <section id="module-tasks" class="module-section">
+          <div class="flex justify-between items-center" style="margin-bottom: 2rem;">
+            <h2>Kanban Board</h2>
+            <button class="btn btn-primary" id="btn-add-task"><i class="fa-solid fa-plus"></i> Add Task</button>
+          </div>
+          <!-- Kanban structure will go here -->
+          <div id="kanban-container" class="grid grid-cols-4 gap-4"></div>
+        </section>
+
+        <!-- Expenses Module -->
+        <section id="module-expenses" class="module-section">
+          <h2>Expenses Tracker</h2>
+        </section>
+
+        <!-- Goals Module -->
+        <section id="module-goals" class="module-section">
+          <h2>Goals Tracker</h2>
+        </section>
+
+        <!-- Habits Module -->
+        <section id="module-habits" class="module-section">
+          <h2>Habit Tracker</h2>
+        </section>
+
+        <!-- Notes Module -->
+        <section id="module-notes" class="module-section">
+          <h2>Notes</h2>
+        </section>
+
+        <!-- Pomodoro Module -->
+        <section id="module-pomodoro" class="module-section">
+          <h2>Pomodoro Timer</h2>
+          <div class="card glass text-center" style="max-width: 400px; margin: 2rem auto; position: relative;">
+            <svg id="pomodoro-svg" width="200" height="200" viewBox="0 0 200 200" style="margin: 0 auto; display: block; transform: rotate(-90deg);">
+              <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"></circle>
+              <circle id="pomodoro-circle" cx="100" cy="100" r="90" fill="none" stroke="var(--primary-color)" stroke-width="8" stroke-linecap="round" stroke-dasharray="565.48" stroke-dashoffset="0" style="transition: stroke-dashoffset 1s linear, stroke 0.5s;"></circle>
+            </svg>
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+              <h1 id="pomodoro-display" style="font-size: 3rem; font-weight: 700; margin: 0;">25:00</h1>
+              <p id="pomodoro-mode-text" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Focus Session</p>
+            </div>
+            
+            <div class="flex justify-center gap-2" style="margin-top: 2rem;">
+              <button class="btn btn-primary" id="pomodoro-start"><i class="fa-solid fa-play"></i> Start</button>
+              <button class="btn btn-secondary" id="pomodoro-reset"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+            </div>
+            <button class="btn btn-secondary" id="pomodoro-mode" style="margin-top: 1rem; width: 100%;">Switch to Break</button>
+            
+            <div style="margin-top: 2rem; border-top: 1px solid var(--card-border); padding-top: 1rem;">
+              <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">Today's Sessions</h4>
+              <div id="pomodoro-sessions" style="display: flex; justify-content: center; gap: 5px; flex-wrap: wrap;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Settings Module -->
+        <section id="module-settings" class="module-section">
+          <h2>Settings</h2>
+          <div class="card glass" style="max-width: 600px; margin-top: 2rem;">
+            <div class="form-group flex justify-between items-center">
+              <label class="form-label" style="margin: 0; font-size: 1rem; color: var(--text-main);">Dark Mode</label>
+              <input type="checkbox" checked style="width: 20px; height: 20px;">
+            </div>
+            <div class="form-group flex justify-between items-center">
+              <label class="form-label" style="margin: 0; font-size: 1rem; color: var(--text-main);">Email Notifications</label>
+              <input type="checkbox" checked style="width: 20px; height: 20px;">
+            </div>
+            <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 2rem 0;">
+            <h3 style="margin-bottom: 1rem;">Data Management</h3>
+            <div class="flex gap-2">
+              <button class="btn btn-primary" onclick="alert('Exporting data as JSON...')"><i class="fa-solid fa-download"></i> Export Data</button>
+              <button class="btn btn-secondary" onclick="alert('Database backup initiated')"><i class="fa-solid fa-database"></i> Backup</button>
+            </div>
+            <div style="margin-top: 2rem;">
+              <button class="btn btn-danger" onclick="if(confirm('Are you sure you want to delete your account?')) alert('Account deleted.')"><i class="fa-solid fa-trash"></i> Delete Account</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
