@@ -62,6 +62,8 @@ export async function initExpenses() {
   document.getElementById('btn-add-income').onclick = () => showAddModal('Income');
   document.getElementById('btn-add-expense').onclick = () => showAddModal('Expense');
   document.getElementById('expense-filter').onchange = renderExpenses;
+
+  window.addEventListener('ai_refresh_expenses', loadExpenses);
 }
 
 async function showAddModal(type) {

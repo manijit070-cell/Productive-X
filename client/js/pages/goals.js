@@ -23,6 +23,8 @@ export async function initGoals() {
       }).catch(err => showToast(err.message, 'error'));
     }
   };
+
+  window.addEventListener('ai_refresh_goals', loadGoals);
 }
 
 async function loadGoals() {

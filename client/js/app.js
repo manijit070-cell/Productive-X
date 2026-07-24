@@ -110,6 +110,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize Global AI Assistant
   initAI();
+
+  window.addEventListener('ai_refresh_dashboard', loadDashboard);
 });
 
 // Dashboard logic

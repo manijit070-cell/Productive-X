@@ -304,11 +304,11 @@ export function initAI() {
       }, 500);
       showToast('Goal Added!', 'success');
     } else if (action === 'ADD_EXPENSE') {
-      // Assuming expenses might be part of dashboard or a separate tab
-      const navItem = document.querySelector('.nav-item[data-target="dashboard"]'); // Fallback
+      const navItem = document.querySelector('.nav-item[data-target="expenses"]');
       if (navItem) navItem.click();
       setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('ai_refresh_dashboard'));
+        window.dispatchEvent(new CustomEvent('ai_refresh_expenses'));
+        window.dispatchEvent(new CustomEvent('ai_refresh_dashboard')); // also refresh dashboard stats
       }, 500);
       showToast('Expense/Income Added!', 'success');
     } else if (action === 'START_POMODORO') {
