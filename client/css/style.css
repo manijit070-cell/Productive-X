@@ -149,6 +149,9 @@ ul {
   .main-content { margin-left: 0; padding-bottom: 70px; } /* Padding for bottom nav */
   .grid-cols-4, .grid-cols-3, .grid-cols-2 { grid-template-columns: 1fr; }
   
+  /* Lock Expenses tab in zoomed-out position */
+  #module-expenses { zoom: 0.7; }
+  
   /* Mobile De-congestion Improvements */
   .content-area {
     padding: 1rem 0.5rem; /* Edge to edge */
