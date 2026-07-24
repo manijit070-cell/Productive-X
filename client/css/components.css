@@ -279,3 +279,16 @@
   0% { transform: scaleY(0.4); opacity: 0.6; }
   100% { transform: scaleY(1.2); opacity: 1; }
 }
+
+/* Mobile Adjustments for AI Overlay */
+@media (max-width: 768px) {
+  #siri-overlay {
+    height: 200px;
+    padding-bottom: 80px; /* Clear bottom nav */
+  }
+  #siri-text {
+    font-size: 1.25rem;
+    margin-bottom: 15px;
+    max-width: 95%;
+  }
+}
