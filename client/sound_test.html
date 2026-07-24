@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wake Word Sound Test</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #1a1a1a;
+    color: white;
+    margin: 0;
+  }
+  h1 { margin-bottom: 2rem; color: #3b82f6; }
+  .btn {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    margin: 0.5rem;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    width: 300px;
+    transition: background-color 0.2s;
+  }
+  .btn:hover { background-color: #1d4ed8; }
+</style>
+</head>
+<body>
+  <h1>Test Wake Word Sounds</h1>
+  <button class="btn" onclick="playSiri()">1. Siri Style (Current)</button>
+  <button class="btn" onclick="playGoogle()">2. Google Assistant Pop</button>
+  <button class="btn" onclick="playSoftPing()">3. Soft Glass Ping</button>
+  <button class="btn" onclick="playFuturistic()">4. Futuristic Chord</button>
+  <button class="btn" onclick="playSubtleTick()">5. Subtle Tick</button>
+
+  <script>
+    let ctx;
+    function getCtx() {
+      if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === 'suspended') ctx.resume();
+      return ctx;
+    }
+
+    function playTone(freq, startTime, duration, type='sine') {
+      const c = getCtx();
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.connect(gain);
+      gain.connect(c.destination);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, startTime);
+      
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(0.08, startTime + 0.05);
+      gain.gain.setValueAtTime(0.08, startTime + duration - 0.1);
+      gain.gain.linearRampToValueAtTime(0, startTime + duration);
+      
+      osc.start(startTime);
+      osc.stop(startTime + duration);
+    }
+
+    function playSiri() {
+      const c = getCtx();
+      const now = c.currentTime;
+      playTone(440, now, 0.15); 
+      playTone(554.37, now + 0.15, 0.25);
+    }
+
+    function playGoogle() {
+      const c = getCtx();
+      const now = c.currentTime;
+      
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.connect(gain);
+      gain.connect(c.destination);
+      
+      osc.type = 'sine';
+      // Quick pitch drop
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+      
+      // Percussive envelope
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.15, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+      
+      osc.start(now);
+      osc.stop(now + 0.1);
+    }
+
+    function playSoftPing() {
+      const c = getCtx();
+      const now = c.currentTime;
+      
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.connect(gain);
+      gain.connect(c.destination);
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1046.50, now); // C6
+      
+      // Very fast attack, slow decay
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.08, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      
+      osc.start(now);
+      osc.stop(now + 0.4);
+    }
+
+    function playFuturistic() {
+      const c = getCtx();
+      const now = c.currentTime;
+      // Smooth, low-pitch futuristic Cmaj7 chord arpeggio
+      playTone(261.63, now, 0.4);       // C4
+      playTone(329.63, now + 0.08, 0.4); // E4
+      playTone(392.00, now + 0.16, 0.4); // G4
+      playTone(493.88, now + 0.24, 0.5); // B4
+    }
+
+    function playSubtleTick() {
+      const c = getCtx();
+      const now = c.currentTime;
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      
+      // High pass filter for a "click" sound
+      const filter = c.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.value = 5000;
+      
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(c.destination);
+      
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(150, now);
+      
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.1, now + 0.005);
+      gain.gain.linearRampToValueAtTime(0, now + 0.02);
+      
+      osc.start(now);
+      osc.stop(now + 0.02);
+    }
+  </script>
+</body>
+</html>

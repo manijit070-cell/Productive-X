@@ -39,10 +39,10 @@ export function initAI() {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, startTime);
         
-        // Smooth volume envelope (fade in/out) for a pleasant sound
+        // Very smooth volume envelope (slower fade in/out) to prevent shrillness
         gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.1, startTime + 0.02);
-        gain.gain.setValueAtTime(0.1, startTime + duration - 0.05);
+        gain.gain.linearRampToValueAtTime(0.08, startTime + 0.05);
+        gain.gain.setValueAtTime(0.08, startTime + duration - 0.1);
         gain.gain.linearRampToValueAtTime(0, startTime + duration);
         
         osc.start(startTime);
@@ -50,9 +50,11 @@ export function initAI() {
       }
 
       const now = ctx.currentTime;
-      // A soft, ascending two-tone chime (A4 -> C#5)
-      playTone(440, now, 0.15); 
-      playTone(554.37, now + 0.15, 0.25);
+      // Smooth, low-pitch futuristic Cmaj7 chord arpeggio
+      playTone(261.63, now, 0.4);       // C4
+      playTone(329.63, now + 0.08, 0.4); // E4
+      playTone(392.00, now + 0.16, 0.4); // G4
+      playTone(493.88, now + 0.24, 0.5); // B4
     } catch(e) {}
   }
 
