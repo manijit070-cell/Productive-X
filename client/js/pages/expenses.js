@@ -72,10 +72,18 @@ async function showAddModal(type) {
   const amount = parseFloat(await customPrompt("Enter amount:"));
   
   if(category && amount) {
+    // Optimistic array update
+    const tempExpense = { _id: 'temp_' + Date.now(), type, category, amount, date: new Date().toISOString() };
+    allExpenses.unshift(tempExpense); // Prepend to top
+    renderExpenses();
+    
     api.createExpense({ type, category, amount }).then(() => {
       showToast('Transaction added');
-      loadExpenses();
-    }).catch(err => showToast(err.message, 'error'));
+      loadExpenses(); // Fetch true DB IDs quietly
+    }).catch(err => {
+      showToast(err.message, 'error');
+      loadExpenses(); // Revert
+    });
   }
 }
 
@@ -135,9 +143,15 @@ function renderExpenses() {
 
     tr.querySelector('.btn-delete').onclick = async () => {
       if(await customConfirm("Are you sure you want to delete this transaction?")) {
+        // Optimistic update
+        allExpenses = allExpenses.filter(e => e._id !== exp._id);
+        renderExpenses(); // Sync local DOM instantly
+        
         api.deleteExpense(exp._id).then(() => {
           showToast('Transaction deleted');
-          loadExpenses();
+        }).catch(() => {
+          showToast('Failed to delete', 'error');
+          loadExpenses(); // Revert on failure
         });
       }
     };

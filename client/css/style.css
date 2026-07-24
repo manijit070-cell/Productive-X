@@ -478,9 +478,10 @@ ul {
   #ai-chat-panel {
     position: fixed;
     bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 92%;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: 94vw;
     max-width: 360px;
     height: 400px;
     max-height: 65vh;

@@ -85,24 +85,55 @@ async function loadTasks() {
           `;
           
           const btnPrev = div.querySelector('.btn-move-prev');
-          if (btnPrev && hasPrev) {
+          if (btnPrev) {
             btnPrev.onclick = async () => {
-              try {
-                await api.updateTask(task._id, { status: statuses[currentIndex - 1] });
-                loadTasks();
-              } catch(err) { showToast('Failed', 'error'); }
+              const currentStatus = div.closest('.kanban-column').getAttribute('data-status');
+              const idx = statuses.indexOf(currentStatus);
+              if (idx > 0) {
+                const newStatus = statuses[idx - 1];
+                const targetCol = document.querySelector(`.kanban-column[data-status="${newStatus}"] .kanban-items`);
+                if (targetCol) {
+                  // Optimistic DOM Update
+                  targetCol.appendChild(div);
+                  btnPrev.disabled = (idx - 1) === 0;
+                  btnPrev.style.opacity = (idx - 1) === 0 ? '0.3' : '1';
+                  const nextBtn = div.querySelector('.btn-move-next');
+                  if(nextBtn) { nextBtn.disabled = false; nextBtn.style.opacity = '1'; }
+                }
+                try {
+                  await api.updateTask(task._id, { status: newStatus });
+                } catch(err) { 
+                  showToast('Failed', 'error');
+                  loadTasks(); // Revert on failure
+                }
+              }
             };
           }
 
           const btnNext = div.querySelector('.btn-move-next');
-          if (btnNext && hasNext) {
+          if (btnNext) {
             btnNext.onclick = async () => {
-              const newStatus = statuses[currentIndex + 1];
-              try {
-                await api.updateTask(task._id, { status: newStatus });
-                if (newStatus === 'Completed') confetti({ particleCount: 50, spread: 60 });
-                loadTasks();
-              } catch(err) { showToast('Failed', 'error'); }
+              const currentStatus = div.closest('.kanban-column').getAttribute('data-status');
+              const idx = statuses.indexOf(currentStatus);
+              if (idx < statuses.length - 1) {
+                const newStatus = statuses[idx + 1];
+                const targetCol = document.querySelector(`.kanban-column[data-status="${newStatus}"] .kanban-items`);
+                if (targetCol) {
+                  // Optimistic DOM Update
+                  targetCol.appendChild(div);
+                  btnNext.disabled = (idx + 1) === statuses.length - 1;
+                  btnNext.style.opacity = (idx + 1) === statuses.length - 1 ? '0.3' : '1';
+                  const prevBtn = div.querySelector('.btn-move-prev');
+                  if(prevBtn) { prevBtn.disabled = false; prevBtn.style.opacity = '1'; }
+                }
+                try {
+                  await api.updateTask(task._id, { status: newStatus });
+                  if (newStatus === 'Completed') confetti({ particleCount: 50, spread: 60 });
+                } catch(err) { 
+                  showToast('Failed', 'error');
+                  loadTasks(); // Revert on failure
+                }
+              }
             };
           }
           
@@ -135,9 +166,14 @@ async function loadTasks() {
 
           div.querySelector('.btn-delete').onclick = async () => {
             if(await customConfirm("Are you sure you want to delete this task?")) {
+              // Optimistic delete
+              div.style.display = 'none';
               api.deleteTask(task._id).then(() => {
                 showToast('Task deleted');
                 div.remove();
+              }).catch(err => {
+                showToast('Failed to delete', 'error');
+                div.style.display = 'block'; // Revert on failure
               });
             }
           };

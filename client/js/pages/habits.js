@@ -80,9 +80,14 @@ async function loadHabits() {
 
         div.querySelector('.btn-delete').onclick = async () => {
           if(await customConfirm("Are you sure you want to delete this habit?")) {
+            // Optimistic DOM Update
+            div.style.display = 'none';
             api.deleteHabit(habit._id).then(() => {
               showToast('Habit deleted');
-              loadHabits();
+              div.remove();
+            }).catch(() => {
+              showToast('Failed to delete', 'error');
+              div.style.display = 'flex'; // Revert on failure
             });
           }
         };
@@ -98,10 +103,29 @@ async function loadHabits() {
               origin: { x: (rect.left + rect.width/2)/window.innerWidth, y: rect.top/window.innerHeight }
             });
             
+            
+            // Optimistic DOM Update
+            checkBtn.innerHTML = '<i class="fa-solid fa-check-double"></i> Completed Today';
+            checkBtn.disabled = true;
+            checkBtn.style.opacity = '0.5';
+            checkBtn.style.cursor = 'not-allowed';
+            
+            const streakEl = div.querySelector('span[style*="var(--success-color)"]');
+            if (streakEl) streakEl.innerHTML = `<i class="fa-solid fa-fire"></i> ${habit.streak + 1} Day Streak`;
+            
+            const historyBars = div.querySelectorAll('div[title]');
+            if (historyBars.length > 0) {
+              const todayBar = historyBars[historyBars.length - 1];
+              todayBar.style.height = '100%';
+              todayBar.style.background = 'var(--success-color)';
+            }
+            
             const newTracking = [...trackedDates, new Date()];
             api.updateHabit(habit._id, { streak: habit.streak + 1, tracking: newTracking }).then(() => {
               showToast('Checked in successfully!');
-              loadHabits();
+            }).catch(err => {
+              showToast('Failed to check in', 'error');
+              loadHabits(); // Revert on failure
             });
           };
         } else {
