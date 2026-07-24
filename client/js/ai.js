@@ -63,6 +63,7 @@ export function initAI() {
   function activateListeningMode() {
     manualVoice = true;
     if (micBtn) micBtn.style.color = 'var(--success-color)';
+    showOverlay("Listening...", 'listening'); // Show animation instantly on mobile
     clearTimeout(manualVoiceTimeout);
     manualVoiceTimeout = setTimeout(() => {
       manualVoice = false;
@@ -122,9 +123,13 @@ export function initAI() {
         let transcript = event.results[i][0].transcript.trim().toLowerCase();
         let foundWakeWord = WAKE_WORDS.find(w => transcript.includes(w));
         
-        if (foundWakeWord) {
+        if (foundWakeWord && !wakeWordTriggered) {
           wakeWordTriggered = true;
           activateListeningMode();
+          playBeep(); // Instant feedback when wake word is caught
+        } else if (foundWakeWord && wakeWordTriggered) {
+           // just keep it alive
+           activateListeningMode();
         }
 
         // Wake word or manual check
@@ -161,10 +166,8 @@ export function initAI() {
                 processCommand(cmdToProcess, true);
               }, 3000);
             } else if (foundWakeWord) {
+              // Beep is already played, just ensure overlay is visible
               showOverlay("Listening...", 'listening');
-              playBeep();
-              // Do NOT speak "Yes I am listening" here, as speech synthesis 
-              // blocks the microphone and interrupts the user if they paused.
             } else if (manualVoice) {
               showOverlay("Listening...", 'listening');
             }
