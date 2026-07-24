@@ -477,9 +477,10 @@ ul {
   
   #ai-chat-panel {
     bottom: 65px;
-    right: 0;
-    width: 320px;
+    right: -0.5rem; /* Shift slightly to balance margin */
+    width: calc(100vw - 2rem); /* Dynamic width to fit screen perfectly */
+    max-width: 340px;
     height: 400px;
-    max-height: 70vh;
+    max-height: 65vh;
   }
 }
