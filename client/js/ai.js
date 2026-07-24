@@ -18,7 +18,20 @@ export function initAI() {
   let wakeWordTriggered = false;
   let recognition = null;
   let restartTimeout = null;
+  let manualVoiceTimeout = null;
+  let currentUtterance = null; // Fix Chrome GC bug for speech synthesis
   const WAKE_WORDS = ['coach', 'couch', 'catch', 'poach', 'cotch', 'gooch'];
+
+  function activateListeningMode() {
+    manualVoice = true;
+    if (micBtn) micBtn.style.color = 'var(--success-color)';
+    clearTimeout(manualVoiceTimeout);
+    manualVoiceTimeout = setTimeout(() => {
+      manualVoice = false;
+      if (!isListening && micBtn) micBtn.style.color = 'var(--text-muted)';
+      hideOverlay();
+    }, 8000);
+  }
 
   const siriOverlay = document.getElementById('siri-overlay');
   const siriText = document.getElementById('siri-text');
@@ -71,6 +84,7 @@ export function initAI() {
         
         if (foundWakeWord) {
           wakeWordTriggered = true;
+          activateListeningMode();
         }
 
         // Wake word or manual check
@@ -92,13 +106,14 @@ export function initAI() {
               botIcon.classList.add('ai-processing'); // CSS animation
               showOverlay(command, 'processing');
               manualVoice = false;
+              clearTimeout(manualVoiceTimeout);
               processCommand(command, true);
             } else if (foundWakeWord || manualVoice) {
               hideOverlay();
               const reply = 'Yes? I am listening.';
               appendChatMessage('assistant', reply);
               speakContent(reply);
-              manualVoice = false;
+              // manualVoice stays true because activateListeningMode() keeps it active
             }
           } else {
             // Interim: Just show what they are saying in real time
@@ -145,8 +160,7 @@ export function initAI() {
     // Manual start override via mic button
     if (micBtn) {
       micBtn.onclick = () => {
-        manualVoice = true;
-        micBtn.style.color = 'var(--success-color)';
+        activateListeningMode();
         showToast('Listening... speak your command!', 'success');
         if (!isListening) {
           try { 
@@ -336,17 +350,17 @@ export function initAI() {
     
     // strip HTML tags
     const cleanText = text.replace(/<[^>]*>?/gm, '');
-    const msg = new SpeechSynthesisUtterance(cleanText);
-    msg.lang = 'en-US';
+    currentUtterance = new SpeechSynthesisUtterance(cleanText);
+    currentUtterance.lang = 'en-US';
     
-    msg.onstart = () => {
+    currentUtterance.onstart = () => {
       isSpeaking = true;
       if (botIcon) botIcon.classList.add('ai-speaking');
       if (recognition) {
         try { recognition.abort(); } catch(e){}
       }
     };
-    msg.onend = () => {
+    currentUtterance.onend = () => {
       isSpeaking = false;
       if (botIcon) botIcon.classList.remove('ai-speaking');
       hideOverlay(); // Hide overlay when done speaking
@@ -354,13 +368,15 @@ export function initAI() {
       // Resume listening
       clearTimeout(restartTimeout);
       restartTimeout = setTimeout(() => {
-        try { recognition.start(); } catch(e){
-          initSpeechEngine();
-          try { recognition.start(); } catch(e2){}
+        if (!isListening) {
+          try { recognition.start(); } catch(e){
+            initSpeechEngine();
+            try { recognition.start(); } catch(e2){}
+          }
         }
       }, 500);
     };
-    msg.onerror = () => {
+    currentUtterance.onerror = () => {
       isSpeaking = false;
       if (botIcon) botIcon.classList.remove('ai-speaking');
       hideOverlay();
@@ -368,9 +384,11 @@ export function initAI() {
       // Resume listening
       clearTimeout(restartTimeout);
       restartTimeout = setTimeout(() => {
-        try { recognition.start(); } catch(e){
-          initSpeechEngine();
-          try { recognition.start(); } catch(e2){}
+        if (!isListening) {
+          try { recognition.start(); } catch(e){
+            initSpeechEngine();
+            try { recognition.start(); } catch(e2){}
+          }
         }
       }, 500);
     };
@@ -379,9 +397,9 @@ export function initAI() {
     let voices = window.speechSynthesis.getVoices();
     if (voices.length > 0) {
       const best = voices.find(v => v.lang.includes('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha')));
-      if (best) msg.voice = best;
+      if (best) currentUtterance.voice = best;
     }
     
-    window.speechSynthesis.speak(msg);
+    window.speechSynthesis.speak(currentUtterance);
   }
 }
