@@ -80,6 +80,8 @@ export function initAI() {
     };
 
     recognition.onresult = (event) => {
+      if (isSpeaking) return; // Prevent AI from listening to its own voice
+      
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         let transcript = event.results[i][0].transcript.trim().toLowerCase();
         let foundWakeWord = WAKE_WORDS.find(w => transcript.includes(w));
@@ -372,9 +374,8 @@ export function initAI() {
     currentUtterance.onstart = () => {
       isSpeaking = true;
       if (botIcon) botIcon.classList.add('ai-speaking');
-      if (recognition) {
-        try { recognition.abort(); } catch(e){}
-      }
+      // Do not abort recognition on mobile as it cannot be restarted without a user gesture.
+      // We ignore the AI's own voice via the isSpeaking flag in onresult.
     };
     currentUtterance.onend = () => {
       isSpeaking = false;
