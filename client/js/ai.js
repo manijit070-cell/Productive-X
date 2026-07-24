@@ -24,6 +24,23 @@ export function initAI() {
   let restartTimeout = null;
   const WAKE_WORDS = ['coach', 'couch', 'catch', 'poach', 'cotch', 'gooch'];
 
+  function playBeep() {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
+    } catch(e) {}
+  }
+
   function activateListeningMode() {
     manualVoice = true;
     if (micBtn) micBtn.style.color = 'var(--success-color)';
@@ -124,12 +141,13 @@ export function initAI() {
                 finalCommand = "";
                 processCommand(cmdToProcess, true);
               }, 3000);
-            } else if (foundWakeWord || manualVoice) {
-              hideOverlay();
-              const reply = 'Yes? I am listening.';
-              appendChatMessage('assistant', reply);
-              speakContent(reply);
-              // manualVoice stays true because activateListeningMode() keeps it active
+            } else if (foundWakeWord) {
+              showOverlay("Listening...", 'listening');
+              playBeep();
+              // Do NOT speak "Yes I am listening" here, as speech synthesis 
+              // blocks the microphone and interrupts the user if they paused.
+            } else if (manualVoice) {
+              showOverlay("Listening...", 'listening');
             }
           } else {
             // Interim: Just show what they are saying in real time
