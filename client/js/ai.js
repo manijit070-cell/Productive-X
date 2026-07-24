@@ -17,9 +17,10 @@ export function initAI() {
   let isSpeaking = false;
   let wakeWordTriggered = false;
   let recognition = null;
-  let restartTimeout = null;
   let manualVoiceTimeout = null;
   let currentUtterance = null; // Fix Chrome GC bug for speech synthesis
+  let finalCommand = "";
+  let silenceTimeout = null;
   const WAKE_WORDS = ['coach', 'couch', 'catch', 'poach', 'cotch', 'gooch'];
 
   function activateListeningMode() {
@@ -100,14 +101,26 @@ export function initAI() {
             command = command.split(' ').slice(1).join(' ').trim();
           }
           
+          clearTimeout(silenceTimeout);
+          
           if (event.results[i].isFinal) {
             wakeWordTriggered = false; // Reset for next sentence
+            
             if (command.length > 0) {
-              botIcon.classList.add('ai-processing'); // CSS animation
-              showOverlay(command, 'processing');
-              manualVoice = false;
-              clearTimeout(manualVoiceTimeout);
-              processCommand(command, true);
+              finalCommand += (finalCommand ? " " : "") + command;
+            }
+            
+            if (finalCommand.length > 0) {
+              showOverlay(finalCommand, 'listening');
+              silenceTimeout = setTimeout(() => {
+                botIcon.classList.add('ai-processing'); // CSS animation
+                showOverlay(finalCommand, 'processing');
+                manualVoice = false;
+                clearTimeout(manualVoiceTimeout);
+                let cmdToProcess = finalCommand;
+                finalCommand = "";
+                processCommand(cmdToProcess, true);
+              }, 1500);
             } else if (foundWakeWord || manualVoice) {
               hideOverlay();
               const reply = 'Yes? I am listening.';
@@ -117,7 +130,8 @@ export function initAI() {
             }
           } else {
             // Interim: Just show what they are saying in real time
-            showOverlay(command || "Listening...", 'listening');
+            let displayCmd = (finalCommand ? finalCommand + " " : "") + command;
+            showOverlay(displayCmd || "Listening...", 'listening');
           }
         }
       }
@@ -364,6 +378,10 @@ export function initAI() {
       isSpeaking = false;
       if (botIcon) botIcon.classList.remove('ai-speaking');
       hideOverlay(); // Hide overlay when done speaking
+      
+      if (cleanText.trim().endsWith('?')) {
+        activateListeningMode();
+      }
       
       // Resume listening
       clearTimeout(restartTimeout);
