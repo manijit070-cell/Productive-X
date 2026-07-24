@@ -32,28 +32,25 @@ export function initAI() {
       
       const now = ctx.currentTime;
       const osc = ctx.createOscillator();
-      const filter = ctx.createBiquadFilter();
       const gain = ctx.createGain();
       
-      osc.connect(filter);
-      filter.connect(gain);
+      osc.connect(gain);
       gain.connect(ctx.destination);
       
-      // Use a triangle wave (warmer than sine) at a low pitch (A3)
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(220, now); 
+      // Pure sine wave for a clean sound
+      osc.type = 'sine';
       
-      // Muffle the sound completely by cutting off all high/shrill frequencies
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(300, now);
+      // Pitch drop: starts mid-high and quickly sweeps low (creates a "water drop" or "pop" sound)
+      osc.frequency.setValueAtTime(600, now);
+      osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
       
-      // Soft envelope
+      // Fast percussive envelope: moderate volume (0.15) so it's audible, but very short
       gain.gain.setValueAtTime(0, now);
-      gain.gain.linearRampToValueAtTime(0.05, now + 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      gain.gain.linearRampToValueAtTime(0.15, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
       
       osc.start(now);
-      osc.stop(now + 0.5);
+      osc.stop(now + 0.1);
     } catch(e) {}
   }
 
