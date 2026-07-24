@@ -135,6 +135,7 @@
         <div class="nav-item" data-target="habits"><i class="fa-solid fa-calendar-check"></i> Habits</div>
         <div class="nav-item" data-target="notes"><i class="fa-solid fa-sticky-note"></i> Notes</div>
         <div class="nav-item" data-target="pomodoro"><i class="fa-solid fa-clock"></i> Pomodoro</div>
+        <div class="nav-item" data-target="fitness"><i class="fa-solid fa-dumbbell"></i> AI Coach</div>
       </nav>
       <div class="nav-bottom">
         <div class="nav-item" data-target="settings"><i class="fa-solid fa-gear"></i> Settings</div>
@@ -279,6 +280,107 @@
           </div>
         </section>
 
+        <!-- Fitness Module -->
+        <section id="module-fitness" class="module-section">
+          <div class="flex justify-between items-center" style="margin-bottom: 2rem;">
+            <h2>AI Fitness Coach</h2>
+            <button class="btn btn-secondary" id="fitness-settings-btn"><i class="fa-solid fa-user-pen"></i> Update Profile</button>
+          </div>
+
+          <!-- Onboarding / Profile Form -->
+          <div id="fitness-onboarding" class="card glass" style="max-width: 500px; margin: 0 auto; display: none;">
+            <h3 class="text-center" style="margin-bottom: 1.5rem;">Create Your AI Plan</h3>
+            <div class="form-group">
+              <label class="form-label">Weight (kg)</label>
+              <input type="number" id="fit-weight" class="form-control" placeholder="e.g. 75">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Height (cm)</label>
+              <input type="number" id="fit-height" class="form-control" placeholder="e.g. 175">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Primary Goal</label>
+              <select id="fit-goal" class="form-control">
+                <option value="Lose Weight">Lose Weight</option>
+                <option value="Build Muscle">Build Muscle</option>
+                <option value="Get Fit">Get Fit</option>
+                <option value="Maintain">Maintain</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fitness Level</label>
+              <select id="fit-level" class="form-control">
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Environment</label>
+              <select id="fit-environment" class="form-control">
+                <option value="Home">Home</option>
+                <option value="Gym">Gym</option>
+                <option value="Outdoors">Outdoors</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Equipment Available</label>
+              <select id="fit-equipment" class="form-control">
+                <option value="None">None (Bodyweight only)</option>
+                <option value="Basic (Dumbbells/Bands)">Basic (Dumbbells/Bands)</option>
+                <option value="Full Gym">Full Gym</option>
+              </select>
+            </div>
+            <button id="btn-generate-plan" class="btn btn-primary" style="width: 100%;"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Plan</button>
+            <div id="fitness-loading" style="display: none; text-align: center; margin-top: 1rem; color: var(--primary-color);">
+              <i class="fa-solid fa-spinner fa-spin"></i> AI is crafting your perfect plan...
+            </div>
+          </div>
+
+          <!-- Plan Dashboard -->
+          <div id="fitness-dashboard" style="display: none;">
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Workout Card -->
+              <div class="card glass">
+                <h3 style="color: var(--primary-color); margin-bottom: 1rem;"><i class="fa-solid fa-dumbbell"></i> Today's Workout</h3>
+                <h4 id="fit-today-focus" style="margin-bottom: 0.5rem; font-weight: 600;">Rest Day</h4>
+                <ul id="fit-today-exercises" style="list-style-position: inside; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+                </ul>
+                <button id="btn-log-workout" class="btn btn-secondary" style="width: 100%;"><i class="fa-solid fa-check"></i> Mark Completed</button>
+              </div>
+              
+              <!-- Nutrition Card -->
+              <div class="card glass">
+                <h3 style="color: var(--success-color); margin-bottom: 1rem;"><i class="fa-solid fa-utensils"></i> Nutrition Target</h3>
+                <div style="font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem;" id="fit-calories">0 kcal</div>
+                <div class="flex justify-between text-center" style="color: var(--text-muted); font-size: 0.9rem;">
+                  <div><strong id="fit-protein" style="color: var(--text-main);">0g</strong><br>Protein</div>
+                  <div><strong id="fit-carbs" style="color: var(--text-main);">0g</strong><br>Carbs</div>
+                  <div><strong id="fit-fat" style="color: var(--text-main);">0g</strong><br>Fat</div>
+                </div>
+                <div style="margin-top: 1.5rem;">
+                  <label class="form-label" style="font-size: 0.85rem;">Log Macros Eaten Today</label>
+                  <div class="flex gap-2" style="margin-bottom: 0.5rem;">
+                    <input type="number" id="fit-log-calories" class="form-control" placeholder="Cal" style="width: 25%;">
+                    <input type="number" id="fit-log-protein" class="form-control" placeholder="Pro (g)" style="width: 25%;">
+                    <input type="number" id="fit-log-carbs" class="form-control" placeholder="Carb (g)" style="width: 25%;">
+                    <input type="number" id="fit-log-fat" class="form-control" placeholder="Fat (g)" style="width: 25%;">
+                  </div>
+                  <button id="btn-log-calories" class="btn btn-secondary" style="width: 100%;">Log Nutrition</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Full Plan Modal/Toggle Button -->
+            <button class="btn btn-secondary" id="btn-view-full-plan" style="margin-top: 1.5rem;"><i class="fa-solid fa-calendar-week"></i> View Full Weekly Plan</button>
+            <div id="full-plan-container" style="display: none; margin-top: 1rem; position: relative;" class="card glass">
+               <div id="full-plan-content"></div>
+            </div>
+          </div>
+
+
+        </section>
+
         <!-- Settings Module -->
         <section id="module-settings" class="module-section">
           <h2>Settings</h2>
@@ -303,6 +405,42 @@
           </div>
         </section>
       </main>
+    </div>
+  </div>
+  <!-- Siri-style Voice Overlay -->
+  <div id="siri-overlay">
+    <div id="siri-text">Listening...</div>
+    <div class="aura-container">
+      <div class="aura-bar"></div>
+      <div class="aura-bar"></div>
+      <div class="aura-bar"></div>
+      <div class="aura-bar"></div>
+      <div class="aura-bar"></div>
+    </div>
+  </div>
+
+  <!-- Floating AI Chat Bot -->
+  <div id="ai-chat-bot-container">
+    <div id="ai-chat-bubble-msg" style="display: none;">Need assistance?</div>
+    <div id="ai-chat-bot-icon">
+      <i class="fa-solid fa-robot"></i>
+    </div>
+    
+    <div id="ai-chat-panel">
+      <div id="ai-chat-header">
+        <span>AI Coach</span>
+        <i class="fa-solid fa-times" id="btn-close-chat" style="cursor: pointer;"></i>
+      </div>
+      <div id="ai-chat-messages">
+        <!-- Chat messages go here -->
+      </div>
+      <div id="ai-chat-input-area">
+        <button id="ai-chat-mic" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0 10px;" title="Start Voice Recognition">
+          <i class="fa-solid fa-microphone"></i>
+        </button>
+        <input type="text" id="ai-chat-input" placeholder="Ask about your plan...">
+        <button id="ai-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
     </div>
   </div>
 

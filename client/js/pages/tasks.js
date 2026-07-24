@@ -23,6 +23,7 @@ export async function initTasks() {
   `;
 
   await loadTasks();
+  initSortable();
 
   document.getElementById('btn-add-task').onclick = async () => {
     const title = await customPrompt("Enter task title:");
@@ -33,6 +34,12 @@ export async function initTasks() {
       }).catch(err => showToast(err.message, 'error'));
     }
   };
+
+  // Listen for AI creating tasks
+  if (!window._tasksAiListenerAdded) {
+    window.addEventListener('ai_refresh_tasks', loadTasks);
+    window._tasksAiListenerAdded = true;
+  }
 }
 
 async function loadTasks() {
@@ -107,8 +114,6 @@ async function loadTasks() {
           col.appendChild(div);
         }
       });
-
-      initSortable();
     }
   } catch (error) {
     showToast(error.message, 'error');

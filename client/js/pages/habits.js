@@ -22,6 +22,12 @@ export async function initHabits() {
       }).catch(err => showToast(err.message, 'error'));
     }
   };
+
+  // Listen for AI creating habits
+  if (!window._habitsAiListenerAdded) {
+    window.addEventListener('ai_refresh_habits', loadHabits);
+    window._habitsAiListenerAdded = true;
+  }
 }
 
 async function loadHabits() {

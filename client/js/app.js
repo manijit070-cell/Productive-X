@@ -1,5 +1,8 @@
 import { api } from './api.js';
 import { showToast } from './components/ui.js';
+import { initPomodoro } from './pages/pomodoro.js';
+import { initFitness } from './pages/fitness.js';
+import { initAI } from './ai.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   if (!api.token) {
@@ -22,6 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const navItems = document.querySelectorAll('.nav-item[data-target]');
   const sections = document.querySelectorAll('.module-section');
   const pageTitle = document.getElementById('page-title');
+  const loadedModules = new Set();
 
   navItems.forEach(item => {
     item.addEventListener('click', () => {
@@ -43,13 +47,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       // Load specific module data if needed
-      if(target === 'dashboard') loadDashboard();
-      if(target === 'tasks') import('./pages/tasks.js').then(m => m.initTasks());
-      if(target === 'expenses') import('./pages/expenses.js').then(m => m.initExpenses());
-      if(target === 'goals') import('./pages/goals.js').then(m => m.initGoals());
-      if(target === 'habits') import('./pages/habits.js').then(m => m.initHabits());
-      if(target === 'notes') import('./pages/notes.js').then(m => m.initNotes());
-      if(target === 'pomodoro') import('./pages/pomodoro.js').then(m => m.initPomodoro());
+      if(target === 'dashboard') {
+        loadDashboard();
+      } else if (!loadedModules.has(target)) {
+        if(target === 'tasks') import('./pages/tasks.js').then(m => { m.initTasks(); loadedModules.add('tasks'); });
+        if(target === 'expenses') import('./pages/expenses.js').then(m => { m.initExpenses(); loadedModules.add('expenses'); });
+        if(target === 'goals') import('./pages/goals.js').then(m => { m.initGoals(); loadedModules.add('goals'); });
+        if(target === 'habits') import('./pages/habits.js').then(m => { m.initHabits(); loadedModules.add('habits'); });
+        if(target === 'notes') import('./pages/notes.js').then(m => { m.initNotes(); loadedModules.add('notes'); });
+        if(target === 'pomodoro') { initPomodoro(); loadedModules.add('pomodoro'); }
+        if(target === 'fitness') { initFitness(); loadedModules.add('fitness'); }
+      }
     });
   });
 
@@ -99,6 +107,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initial load
   loadDashboard();
+
+  // Initialize Global AI Assistant
+  initAI();
 });
 
 // Dashboard logic

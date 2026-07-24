@@ -24,6 +24,8 @@ app.use('/api/habits', require('./routes/habits'));
 app.use('/api/notes', require('./routes/notes'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/settings', require('./routes/settings'));
+app.use('/api/fitness', require('./routes/fitness'));
+app.use('/api/ai', require('./routes/ai'));
 
 // Serve static files
 const path = require('path');

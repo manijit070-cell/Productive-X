@@ -16,6 +16,27 @@ export function initPomodoro() {
   document.getElementById('pomodoro-reset').onclick = resetTimer;
   document.getElementById('pomodoro-mode').onclick = toggleMode;
   
+  // AI Event Listener
+  window.addEventListener('ai_start_pomodoro', (e) => {
+    workMinutes = e.detail.minutes || 25;
+    mode = 'work';
+    
+    // update DOM
+    document.getElementById('pomodoro-mode').innerHTML = 'Switch to Break';
+    document.getElementById('pomodoro-mode-text').textContent = 'Focus Session';
+    const circle = document.getElementById('pomodoro-circle');
+    if (circle) circle.style.stroke = 'var(--primary-color)';
+    
+    // reset timer logic
+    clearInterval(timerInterval);
+    isRunning = false;
+    timeLeft = workMinutes * 60;
+    updateDisplay();
+    
+    // start it
+    toggleTimer();
+  });
+  
   // Settings Logic
   const settingsBtn = document.getElementById('pomodoro-settings-btn');
   const settingsPanel = document.getElementById('pomodoro-settings-panel');

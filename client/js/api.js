@@ -83,11 +83,21 @@ class ApiService {
   updateHabit(id, habit) { return this.request(`/habits/${id}`, 'PUT', habit); }
   deleteHabit(id) { return this.request(`/habits/${id}`, 'DELETE'); }
 
-  // Notes
-  getNotes() { return this.request('/notes'); }
-  createNote(note) { return this.request('/notes', 'POST', note); }
-  updateNote(id, note) { return this.request(`/notes/${id}`, 'PUT', note); }
-  deleteNote(id) { return this.request(`/notes/${id}`, 'DELETE'); }
+  // Note Methods
+  async getNotes() { return this.request('/notes'); }
+  async addNote(noteData) { return this.request('/notes', 'POST', noteData); }
+  async updateNote(id, noteData) { return this.request(`/notes/${id}`, 'PUT', noteData); }
+  async deleteNote(id) { return this.request(`/notes/${id}`, 'DELETE'); }
+  
+  // Fitness
+  getFitnessProfile() { return this.request('/fitness/profile'); }
+  saveFitnessProfile(data) { return this.request('/fitness/profile', 'POST', data); }
+  generateFitnessPlan() { return this.request('/fitness/generate', 'POST'); }
+  logFitnessData(data) { return this.request('/fitness/log', 'POST', data); }
+  editFitnessPlan(prompt) { return this.request('/fitness/edit', 'POST', { prompt }); }
+
+  // Global AI
+  sendAiCommand(command) { return this.request('/ai/command', 'POST', { command }); }
 
   // Settings
   getSettings() { return this.request('/settings'); }
