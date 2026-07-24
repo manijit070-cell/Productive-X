@@ -29,15 +29,30 @@ export function initAI() {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       if (!AudioContext) return;
       const ctx = new AudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, ctx.currentTime);
-      gain.gain.setValueAtTime(0.1, ctx.currentTime);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.15);
+      
+      function playTone(freq, startTime, duration) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, startTime);
+        
+        // Smooth volume envelope (fade in/out) for a pleasant sound
+        gain.gain.setValueAtTime(0, startTime);
+        gain.gain.linearRampToValueAtTime(0.1, startTime + 0.02);
+        gain.gain.setValueAtTime(0.1, startTime + duration - 0.05);
+        gain.gain.linearRampToValueAtTime(0, startTime + duration);
+        
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      }
+
+      const now = ctx.currentTime;
+      // A soft, ascending two-tone chime (A4 -> C#5)
+      playTone(440, now, 0.15); 
+      playTone(554.37, now + 0.15, 0.25);
     } catch(e) {}
   }
 
