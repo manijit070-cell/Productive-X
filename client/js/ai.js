@@ -39,10 +39,10 @@ export function initAI() {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, startTime);
         
-        // Drastically reduced volume (0.02 instead of 0.08) for a much softer sound
+        // Drastically reduced volume (0.005 instead of 0.02) for a whisper-quiet sound
         gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.02, startTime + 0.05); // Very gentle attack
-        gain.gain.setValueAtTime(0.02, startTime + duration - 0.4); // Hold
+        gain.gain.linearRampToValueAtTime(0.005, startTime + 0.05); // Whisper quiet attack
+        gain.gain.setValueAtTime(0.005, startTime + duration - 0.4); // Hold
         gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration); // Smooth fade out
         
         osc.start(startTime);
