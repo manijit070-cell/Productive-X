@@ -143,10 +143,6 @@ export function initAI() {
         if (foundWakeWord) {
           const wakeIndex = transcript.indexOf(foundWakeWord);
           command = transcript.substring(wakeIndex + foundWakeWord.length).trim();
-        } else if (wakeWordTriggered && !foundWakeWord) {
-          // The wake word was here earlier but got mutated out by interim results.
-          // Just strip the first word assuming it was the mutated wake word.
-          command = command.split(' ').slice(1).join(' ').trim();
         }
         
         showOverlay(command || "Listening...", 'listening');
