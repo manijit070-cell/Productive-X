@@ -35,18 +35,20 @@ export async function initExpenses() {
     </div>
 
     <div class="grid grid-cols-3 gap-4">
-      <div class="card glass col-span-2" style="grid-column: span 2;">
-        <table style="width: 100%; text-align: left; border-collapse: collapse;">
-          <thead>
-            <tr style="border-bottom: 1px solid var(--card-border);">
-              <th style="padding: 1rem;">Date</th>
-              <th style="padding: 1rem;">Category</th>
-              <th style="padding: 1rem;">Amount</th>
-              <th style="padding: 1rem; text-align: right;">Action</th>
-            </tr>
-          </thead>
-          <tbody id="expense-list"></tbody>
-        </table>
+      <div class="card glass col-span-2">
+        <div style="overflow-x: auto; width: 100%;">
+          <table style="width: 100%; min-width: 400px; text-align: left; border-collapse: collapse;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--card-border);">
+                <th style="padding: 1rem;">Date</th>
+                <th style="padding: 1rem;">Category</th>
+                <th style="padding: 1rem;">Amount</th>
+                <th style="padding: 1rem; text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="expense-list"></tbody>
+          </table>
+        </div>
       </div>
       <div class="card glass flex-col">
         <h3 style="margin-bottom: 1rem; text-align: center;">Expenses by Category</h3>
