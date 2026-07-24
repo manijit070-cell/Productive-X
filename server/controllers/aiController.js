@@ -20,7 +20,7 @@ The user just said this to you: "${command}"
 Your job is to parse their intent and return a STRICT JSON object telling the frontend what to do.
 The JSON must have this exact structure:
 {
-  "action": "NAVIGATE" | "ADD_HABIT" | "ADD_TASK" | "ADD_GOAL" | "ADD_EXPENSE" | "START_POMODORO" | "EDIT_FITNESS" | "CHAT" | "ERROR",
+  "action": "NAVIGATE" | "ADD_HABIT" | "ADD_TASK" | "ADD_GOAL" | "ADD_EXPENSE" | "START_POMODORO" | "PAUSE_POMODORO" | "RESET_POMODORO" | "EDIT_FITNESS" | "CHAT" | "ERROR",
   "payload": {
     // For NAVIGATE: { "tab": "dashboard" | "tasks" | "habits" | "pomodoro" | "fitness" | "goals" }
     // For ADD_HABIT: { "name": "habit name", "frequency": "Daily" | "Weekly" }
@@ -40,7 +40,9 @@ Rules:
 - If they ask to add a task, use ADD_TASK.
 - If they ask to add a goal, use ADD_GOAL.
 - If they ask to add an expense or income, use ADD_EXPENSE.
-- If they ask to set a timer or start focus, use START_POMODORO.
+- If they ask to set a timer or start focus or resume, use START_POMODORO.
+- If they ask to pause or stop the timer, use PAUSE_POMODORO.
+- If they ask to reset the timer, use RESET_POMODORO.
 - If they ask to change or edit their workout, fitness, or nutrition plan, use EDIT_FITNESS.
 - If it's a general question or greeting (e.g. "Hey Coach", "How are you"), use CHAT.
 - Be concise.

@@ -311,6 +311,14 @@ export function initAI() {
         window.dispatchEvent(new CustomEvent('ai_refresh_dashboard'));
       }, 500);
       showToast('Expense/Income Added!', 'success');
+    } else if (action === 'START_POMODORO') {
+      const navItem = document.querySelector('.nav-item[data-target="pomodoro"]');
+      if (navItem) navItem.click();
+      window.dispatchEvent(new CustomEvent('ai_start_pomodoro', { detail: { minutes: payload.minutes || null } }));
+    } else if (action === 'PAUSE_POMODORO') {
+      window.dispatchEvent(new CustomEvent('ai_pause_pomodoro'));
+    } else if (action === 'RESET_POMODORO') {
+      window.dispatchEvent(new CustomEvent('ai_reset_pomodoro'));
     } else if (action === 'EDIT_FITNESS') {
       const navItem = document.querySelector('.nav-item[data-target="fitness"]');
       if (navItem) navItem.click();
@@ -337,13 +345,6 @@ export function initAI() {
          appendChatMessage('assistant', 'Network error reaching the fitness coach.');
          hideOverlay();
       });
-    } else if (action === 'START_POMODORO') {
-      const navItem = document.querySelector('.nav-item[data-target="pomodoro"]');
-      if (navItem) navItem.click();
-      
-      // Attempt to set timer and start (requires pomodoro script to be global or event-based)
-      // For now, we dispatch an event
-      window.dispatchEvent(new CustomEvent('ai_start_pomodoro', { detail: { minutes: payload.minutes || 25 } }));
     }
   }
 
