@@ -39,22 +39,22 @@ export function initAI() {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, startTime);
         
-        // Very smooth volume envelope (slower fade in/out) to prevent shrillness
+        // Super smooth exponential decay for an ear-soothing tail
         gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.08, startTime + 0.05);
-        gain.gain.setValueAtTime(0.08, startTime + duration - 0.1);
-        gain.gain.linearRampToValueAtTime(0, startTime + duration);
+        gain.gain.linearRampToValueAtTime(0.08, startTime + 0.05); // Gentle attack
+        gain.gain.setValueAtTime(0.08, startTime + duration - 0.4); // Hold
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration); // Smooth fade out
         
         osc.start(startTime);
         osc.stop(startTime + duration);
       }
 
       const now = ctx.currentTime;
-      // Smooth, low-pitch futuristic Cmaj7 chord arpeggio
-      playTone(261.63, now, 0.4);       // C4
-      playTone(329.63, now + 0.08, 0.4); // E4
-      playTone(392.00, now + 0.16, 0.4); // G4
-      playTone(493.88, now + 0.24, 0.5); // B4
+      // Smooth, low-pitch futuristic Cmaj7 chord arpeggio with long ringing tail
+      playTone(261.63, now, 0.8);       // C4
+      playTone(329.63, now + 0.08, 0.8); // E4
+      playTone(392.00, now + 0.16, 0.8); // G4
+      playTone(493.88, now + 0.24, 1.0); // B4
     } catch(e) {}
   }
 
