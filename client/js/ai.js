@@ -36,18 +36,15 @@ export function initAI() {
         osc.connect(gain);
         gain.connect(ctx.destination);
         
-        // Using triangle wave instead of sine. Triangle is much warmer, 
-        // duller, and completely lacks the "shrill" piercing quality of a sine wave.
         osc.type = 'triangle'; 
         osc.frequency.setValueAtTime(freq, startTime);
         
         gain.gain.setValueAtTime(0, startTime);
-        // Moderate volume (0.06) so it's clearly audible, but not loud
-        gain.gain.linearRampToValueAtTime(0.06, startTime + 0.05); 
+        // Reduced volume (0.03) for a softer tone, faster attack (0.03s)
+        gain.gain.linearRampToValueAtTime(0.03, startTime + 0.03); 
         
-        const holdEnd = Math.max(startTime + 0.05, startTime + duration - 0.4);
-        gain.gain.setValueAtTime(0.06, holdEnd);
-        // Smooth exponential tail so it rings out naturally without popping
+        const holdEnd = Math.max(startTime + 0.03, startTime + duration - 0.2);
+        gain.gain.setValueAtTime(0.03, holdEnd);
         gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
         
         osc.start(startTime);
@@ -55,11 +52,11 @@ export function initAI() {
       }
 
       const now = ctx.currentTime;
-      // The Futuristic Chord (Cmaj7 arpeggio) down one octave
-      playTone(261.63, now, 0.8);        // C4
-      playTone(329.63, now + 0.08, 0.8); // E4
-      playTone(392.00, now + 0.16, 0.8); // G4
-      playTone(493.88, now + 0.24, 1.0); // B4
+      // Faster arpeggio and shorter ringing duration (shorter sound overall)
+      playTone(261.63, now, 0.3);        // C4
+      playTone(329.63, now + 0.05, 0.3); // E4
+      playTone(392.00, now + 0.10, 0.3); // G4
+      playTone(493.88, now + 0.15, 0.4); // B4
     } catch(e) {}
   }
 
