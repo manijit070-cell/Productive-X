@@ -6,19 +6,19 @@ export async function initTasks() {
   container.innerHTML = `
     <div class="kanban-column card glass" data-status="To Do">
       <h3 style="margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--primary-color)">To Do</h3>
-      <div class="kanban-items" style="min-height: 50vh" id="col-todo"></div>
+      <div class="kanban-items" id="col-todo"></div>
     </div>
     <div class="kanban-column card glass" data-status="In Progress">
       <h3 style="margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--warning-color)">In Progress</h3>
-      <div class="kanban-items" style="min-height: 50vh" id="col-inprogress"></div>
+      <div class="kanban-items" id="col-inprogress"></div>
     </div>
     <div class="kanban-column card glass" data-status="Review">
       <h3 style="margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--accent-color)">Review</h3>
-      <div class="kanban-items" style="min-height: 50vh" id="col-review"></div>
+      <div class="kanban-items" id="col-review"></div>
     </div>
     <div class="kanban-column card glass" data-status="Completed">
       <h3 style="margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--success-color)">Completed</h3>
-      <div class="kanban-items" style="min-height: 50vh" id="col-completed"></div>
+      <div class="kanban-items" id="col-completed"></div>
     </div>
   `;
 
