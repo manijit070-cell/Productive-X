@@ -30,27 +30,36 @@ export function initAI() {
       if (!AudioContext) return;
       const ctx = new AudioContext();
       
+      function playTone(freq, startTime, duration) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        // Using triangle wave instead of sine. Triangle is much warmer, 
+        // duller, and completely lacks the "shrill" piercing quality of a sine wave.
+        osc.type = 'triangle'; 
+        osc.frequency.setValueAtTime(freq, startTime);
+        
+        gain.gain.setValueAtTime(0, startTime);
+        // Moderate volume (0.06) so it's clearly audible, but not loud
+        gain.gain.linearRampToValueAtTime(0.06, startTime + 0.05); 
+        
+        const holdEnd = Math.max(startTime + 0.05, startTime + duration - 0.4);
+        gain.gain.setValueAtTime(0.06, holdEnd);
+        // Smooth exponential tail so it rings out naturally without popping
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+        
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      }
+
       const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      
-      // Pure sine wave for a clean sound
-      osc.type = 'sine';
-      
-      // Pitch drop: starts mid-high and quickly sweeps low (creates a "water drop" or "pop" sound)
-      osc.frequency.setValueAtTime(600, now);
-      osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
-      
-      // Fast percussive envelope: moderate volume (0.15) so it's audible, but very short
-      gain.gain.setValueAtTime(0, now);
-      gain.gain.linearRampToValueAtTime(0.15, now + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-      
-      osc.start(now);
-      osc.stop(now + 0.1);
+      // The Futuristic Chord (Cmaj7 arpeggio) down one octave
+      playTone(261.63, now, 0.8);        // C4
+      playTone(329.63, now + 0.08, 0.8); // E4
+      playTone(392.00, now + 0.16, 0.8); // G4
+      playTone(493.88, now + 0.24, 1.0); // B4
     } catch(e) {}
   }
 
