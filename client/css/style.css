@@ -138,11 +138,6 @@ ul {
   overflow-y: auto;
 }
 
-/* Col Spans */
-.col-span-2 {
-  grid-column: span 2;
-}
-
 /* Responsive */
 @media (max-width: 1024px) {
   .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
@@ -153,7 +148,6 @@ ul {
   .sidebar { display: none !important; }
   .main-content { margin-left: 0; padding-bottom: 70px; } /* Padding for bottom nav */
   .grid-cols-4, .grid-cols-3, .grid-cols-2 { grid-template-columns: 1fr; }
-  .col-span-2 { grid-column: span 1; }
   
   /* Mobile De-congestion Improvements */
   .content-area {

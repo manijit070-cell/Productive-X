@@ -7,9 +7,9 @@ let allExpenses = [];
 export async function initExpenses() {
   const container = document.getElementById('module-expenses');
   container.innerHTML = `
-    <div class="flex justify-between items-center" style="margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div class="flex justify-between items-center" style="margin-bottom: 2rem;">
       <h2>Expense Tracker</h2>
-      <div class="flex gap-2" style="flex-wrap: wrap;">
+      <div class="flex gap-2">
         <select id="expense-filter" class="form-control" style="width: 150px; padding: 0.5rem;">
           <option value="all">All Time</option>
           <option value="month">This Month</option>
@@ -35,20 +35,18 @@ export async function initExpenses() {
     </div>
 
     <div class="grid grid-cols-3 gap-4">
-      <div class="card glass col-span-2" style="min-width: 0; overflow: hidden;">
-        <div style="overflow-x: auto; width: 100%;">
-          <table style="width: 100%; min-width: 400px; text-align: left; border-collapse: collapse;">
-            <thead>
-              <tr style="border-bottom: 1px solid var(--card-border);">
-                <th style="padding: 1rem;">Date</th>
-                <th style="padding: 1rem;">Category</th>
-                <th style="padding: 1rem;">Amount</th>
-                <th style="padding: 1rem; text-align: right;">Action</th>
-              </tr>
-            </thead>
-            <tbody id="expense-list"></tbody>
-          </table>
-        </div>
+      <div class="card glass col-span-2" style="grid-column: span 2;">
+        <table style="width: 100%; text-align: left; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--card-border);">
+              <th style="padding: 1rem;">Date</th>
+              <th style="padding: 1rem;">Category</th>
+              <th style="padding: 1rem;">Amount</th>
+              <th style="padding: 1rem; text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="expense-list"></tbody>
+        </table>
       </div>
       <div class="card glass flex-col">
         <h3 style="margin-bottom: 1rem; text-align: center;">Expenses by Category</h3>
