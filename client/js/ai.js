@@ -120,7 +120,7 @@ export function initAI() {
                 let cmdToProcess = finalCommand;
                 finalCommand = "";
                 processCommand(cmdToProcess, true);
-              }, 1500);
+              }, 3000);
             } else if (foundWakeWord || manualVoice) {
               hideOverlay();
               const reply = 'Yes? I am listening.';
