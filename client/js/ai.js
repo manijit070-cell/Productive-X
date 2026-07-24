@@ -19,8 +19,6 @@ export function initAI() {
   let recognition = null;
   let manualVoiceTimeout = null;
   let currentUtterance = null; // Fix Chrome GC bug for speech synthesis
-  let finalCommand = "";
-  let silenceTimeout = null;
   let restartTimeout = null;
   const WAKE_WORDS = ['coach', 'couch', 'catch', 'poach', 'cotch', 'gooch'];
 
@@ -107,7 +105,7 @@ export function initAI() {
     }
 
     recognition = new webkitSpeechRecognition();
-    recognition.continuous = true; // Keep listening
+    recognition.continuous = false; // Fixes Android Chrome text duplication bug
     recognition.interimResults = true; // Enable real-time transcript
     recognition.lang = 'en-US';
 
@@ -119,62 +117,55 @@ export function initAI() {
     recognition.onresult = (event) => {
       if (isSpeaking) return; // Prevent AI from listening to its own voice
       
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        let transcript = event.results[i][0].transcript.trim().toLowerCase();
-        let foundWakeWord = WAKE_WORDS.find(w => transcript.includes(w));
-        
-        if (foundWakeWord && !wakeWordTriggered) {
-          wakeWordTriggered = true;
-          activateListeningMode();
-          playBeep(); // Instant feedback when wake word is caught
-        } else if (foundWakeWord && wakeWordTriggered) {
-           // just keep it alive
-           activateListeningMode();
-        }
+      let transcript = "";
+      let isFinal = false;
 
-        // Wake word or manual check
-        if (manualVoice || wakeWordTriggered) {
-          let command = transcript;
-          
-          if (foundWakeWord) {
-            const wakeIndex = transcript.indexOf(foundWakeWord);
-            command = transcript.substring(wakeIndex + foundWakeWord.length).trim();
-          } else if (wakeWordTriggered && !foundWakeWord) {
-            // The wake word was here earlier but got mutated out by interim results.
-            // Just strip the first word assuming it was the mutated wake word.
-            command = command.split(' ').slice(1).join(' ').trim();
-          }
-          
-          clearTimeout(silenceTimeout);
-          
-          if (event.results[i].isFinal) {
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        transcript += event.results[i][0].transcript;
+        if (event.results[i].isFinal) isFinal = true;
+      }
+      
+      transcript = transcript.trim().toLowerCase();
+      let foundWakeWord = WAKE_WORDS.find(w => transcript.includes(w));
+      
+      if (foundWakeWord && !wakeWordTriggered) {
+        wakeWordTriggered = true;
+        activateListeningMode();
+        playBeep(); // Instant feedback when wake word is caught
+      } else if (foundWakeWord && wakeWordTriggered) {
+         activateListeningMode();
+      }
+
+      // Wake word or manual check
+      if (manualVoice || wakeWordTriggered) {
+        let command = transcript;
+        
+        if (foundWakeWord) {
+          const wakeIndex = transcript.indexOf(foundWakeWord);
+          command = transcript.substring(wakeIndex + foundWakeWord.length).trim();
+        } else if (wakeWordTriggered && !foundWakeWord) {
+          // The wake word was here earlier but got mutated out by interim results.
+          // Just strip the first word assuming it was the mutated wake word.
+          command = command.split(' ').slice(1).join(' ').trim();
+        }
+        
+        showOverlay(command || "Listening...", 'listening');
+
+        if (isFinal) {
+          if (command.length > 0) {
             wakeWordTriggered = false; // Reset for next sentence
+            manualVoice = false;
+            clearTimeout(manualVoiceTimeout);
             
-            if (command.length > 0) {
-              finalCommand += (finalCommand ? " " : "") + command;
-            }
+            if (botIcon) botIcon.classList.add('ai-processing');
+            showOverlay(command, 'processing');
             
-            if (finalCommand.length > 0) {
-              showOverlay(finalCommand, 'listening');
-              silenceTimeout = setTimeout(() => {
-                botIcon.classList.add('ai-processing'); // CSS animation
-                showOverlay(finalCommand, 'processing');
-                manualVoice = false;
-                clearTimeout(manualVoiceTimeout);
-                let cmdToProcess = finalCommand;
-                finalCommand = "";
-                processCommand(cmdToProcess, true);
-              }, 3000);
-            } else if (foundWakeWord) {
-              // Beep is already played, just ensure overlay is visible
-              showOverlay("Listening...", 'listening');
-            } else if (manualVoice) {
-              showOverlay("Listening...", 'listening');
-            }
+            try { recognition.abort(); } catch(e){} // Stop mic to avoid noise
+            processCommand(command, true);
           } else {
-            // Interim: Just show what they are saying in real time
-            let displayCmd = (finalCommand ? finalCommand + " " : "") + command;
-            showOverlay(displayCmd || "Listening...", 'listening');
+            // They said wake word but paused before giving command.
+            // Engine will naturally restart via onend, keep listening mode active.
+            activateListeningMode(); 
           }
         }
       }
