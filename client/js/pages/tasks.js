@@ -1,5 +1,5 @@
 import { api } from '../api.js';
-import { showToast } from '../components/ui.js';
+import { showToast, customPrompt, customConfirm } from '../components/ui.js';
 
 export async function initTasks() {
   const container = document.getElementById('kanban-container');
@@ -24,8 +24,8 @@ export async function initTasks() {
 
   await loadTasks();
 
-  document.getElementById('btn-add-task').onclick = () => {
-    const title = prompt("Enter task title:");
+  document.getElementById('btn-add-task').onclick = async () => {
+    const title = await customPrompt("Enter task title:");
     if(title) {
       api.createTask({ title, status: 'To Do' }).then(() => {
         showToast('Task added');
@@ -95,11 +95,13 @@ async function loadTasks() {
             input.focus();
           };
 
-          div.querySelector('.btn-delete').onclick = () => {
-            api.deleteTask(task._id).then(() => {
-              showToast('Task deleted');
-              div.remove();
-            });
+          div.querySelector('.btn-delete').onclick = async () => {
+            if(await customConfirm("Are you sure you want to delete this task?")) {
+              api.deleteTask(task._id).then(() => {
+                showToast('Task deleted');
+                div.remove();
+              });
+            }
           };
 
           col.appendChild(div);

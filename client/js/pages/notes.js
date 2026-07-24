@@ -1,5 +1,5 @@
 import { api } from '../api.js';
-import { showToast } from '../components/ui.js';
+import { showToast, customConfirm } from '../components/ui.js';
 
 let masonryInstance = null;
 const colors = ['#1E293B', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
@@ -48,7 +48,7 @@ async function loadNotes() {
         div.innerHTML = `
           <div style="display:flex; justify-content:space-between; margin-bottom: 1rem;">
             <input type="text" class="note-title" value="${note.title}" style="background:transparent; border:none; color:white; font-size:1.1rem; font-weight:600; width:80%; outline:none;">
-            <i class="fa-solid fa-thumbtack btn-pin" style="color: ${note.isPinned ? 'var(--warning-color)' : 'rgba(255,255,255,0.3)'}; cursor:pointer;"></i>
+            <i class="fa-solid fa-thumbtack btn-pin" style="color: ${note.isPinned ? 'var(--warning-color)' : 'var(--text-muted)'}; cursor:pointer;"></i>
           </div>
           <textarea class="note-content" style="background:transparent; border:none; color:var(--text-main); width:100%; min-height:100px; resize:none; outline:none; font-family:inherit;">${note.content}</textarea>
           <div style="display:flex; justify-content:space-between; margin-top:1rem; align-items:center;">
@@ -89,8 +89,10 @@ async function loadNotes() {
           loadNotes();
         };
 
-        div.querySelector('.btn-delete').onclick = () => {
-          api.deleteNote(note._id).then(() => loadNotes());
+        div.querySelector('.btn-delete').onclick = async () => {
+          if(await customConfirm("Are you sure you want to delete this note?")) {
+            api.deleteNote(note._id).then(() => loadNotes());
+          }
         };
 
         div.querySelectorAll('.color-dot').forEach(dot => {

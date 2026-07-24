@@ -75,11 +75,13 @@ class ApiService {
   getGoals() { return this.request('/goals'); }
   createGoal(goal) { return this.request('/goals', 'POST', goal); }
   updateGoal(id, goal) { return this.request(`/goals/${id}`, 'PUT', goal); }
+  deleteGoal(id) { return this.request(`/goals/${id}`, 'DELETE'); }
 
   // Habits
   getHabits() { return this.request('/habits'); }
   createHabit(habit) { return this.request('/habits', 'POST', habit); }
   updateHabit(id, habit) { return this.request(`/habits/${id}`, 'PUT', habit); }
+  deleteHabit(id) { return this.request(`/habits/${id}`, 'DELETE'); }
 
   // Notes
   getNotes() { return this.request('/notes'); }

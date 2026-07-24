@@ -60,14 +60,13 @@
       margin-top: auto;
     }
 
-    /* Navbar */
     .navbar {
       height: var(--navbar-height);
       position: fixed;
       top: 0;
       right: 0;
       left: var(--sidebar-width);
-      background-color: rgba(15, 23, 42, 0.8);
+      background-color: var(--nav-bg);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--card-border);
       display: flex;
@@ -148,9 +147,14 @@
       <header class="navbar">
         <div class="mobile-toggle" id="mobile-toggle"><i class="fa-solid fa-bars"></i></div>
         <h2 id="page-title">Dashboard</h2>
-        <div class="user-profile">
-          <span id="user-name-display">User Name</span>
-          <div class="avatar" id="user-avatar">U</div>
+        <div class="flex items-center gap-4">
+          <button id="theme-toggle-btn" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--card-border); background: var(--btn-secondary-bg); color: var(--text-main);">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+          <div class="user-profile">
+            <span id="user-name-display">User Name</span>
+            <div class="avatar" id="user-avatar">U</div>
+          </div>
         </div>
       </header>
 
@@ -179,12 +183,16 @@
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="card glass">
-              <h3>Task Completion</h3>
-              <canvas id="taskChart"></canvas>
+              <h3 style="margin-bottom: 1rem;">Task Completion</h3>
+              <div style="position: relative; height: 250px; width: 100%;">
+                <canvas id="taskChart"></canvas>
+              </div>
             </div>
             <div class="card glass">
-              <h3>Expense Distribution</h3>
-              <canvas id="expenseChart"></canvas>
+              <h3 style="margin-bottom: 1rem;">Expense Distribution</h3>
+              <div style="position: relative; height: 250px; width: 100%;">
+                <canvas id="expenseChart"></canvas>
+              </div>
             </div>
           </div>
         </section>
@@ -222,14 +230,37 @@
         <!-- Pomodoro Module -->
         <section id="module-pomodoro" class="module-section">
           <h2>Pomodoro Timer</h2>
-          <div class="card glass text-center" style="max-width: 400px; margin: 2rem auto; position: relative;">
-            <svg id="pomodoro-svg" width="200" height="200" viewBox="0 0 200 200" style="margin: 0 auto; display: block; transform: rotate(-90deg);">
-              <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"></circle>
-              <circle id="pomodoro-circle" cx="100" cy="100" r="90" fill="none" stroke="var(--primary-color)" stroke-width="8" stroke-linecap="round" stroke-dasharray="565.48" stroke-dashoffset="0" style="transition: stroke-dashoffset 1s linear, stroke 0.5s;"></circle>
-            </svg>
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-              <h1 id="pomodoro-display" style="font-size: 3rem; font-weight: 700; margin: 0;">25:00</h1>
-              <p id="pomodoro-mode-text" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Focus Session</p>
+          <div class="card glass text-center" style="max-width: 400px; margin: 2rem auto;">
+            
+            <div style="display: flex; justify-content: flex-end; margin-bottom: -1rem; position: relative; z-index: 10;">
+              <button id="pomodoro-settings-btn" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center;">
+                <i class="fa-solid fa-gear"></i>
+              </button>
+            </div>
+
+            <div id="pomodoro-settings-panel" style="display: none; background: var(--card-bg); border: 1px solid var(--card-border); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; text-align: left;">
+              <div class="flex gap-2 mb-2">
+                <div style="flex: 1;">
+                  <label class="form-label">Focus (min)</label>
+                  <input type="number" id="pomo-focus-input" class="form-control" value="25" min="1">
+                </div>
+                <div style="flex: 1;">
+                  <label class="form-label">Break (min)</label>
+                  <input type="number" id="pomo-break-input" class="form-control" value="5" min="1">
+                </div>
+              </div>
+              <button id="pomodoro-save-settings" class="btn btn-primary" style="width: 100%; padding: 0.5rem;">Save</button>
+            </div>
+
+            <div style="display: grid; place-items: center; width: 200px; height: 200px; margin: 0 auto;">
+              <svg id="pomodoro-svg" width="200" height="200" viewBox="0 0 200 200" style="grid-column: 1; grid-row: 1; transform: rotate(-90deg);">
+                <circle cx="100" cy="100" r="90" fill="none" stroke="var(--card-border)" stroke-width="8"></circle>
+                <circle id="pomodoro-circle" cx="100" cy="100" r="90" fill="none" stroke="var(--primary-color)" stroke-width="8" stroke-linecap="round" stroke-dasharray="565.48" stroke-dashoffset="0" style="transition: stroke-dashoffset 1s linear, stroke 0.5s;"></circle>
+              </svg>
+              <div style="grid-column: 1; grid-row: 1; text-align: center; z-index: 2;">
+                <h1 id="pomodoro-display" style="font-size: 3rem; font-weight: 700; margin: 0; line-height: 1;">25:00</h1>
+                <p id="pomodoro-mode-text" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Focus Session</p>
+              </div>
             </div>
             
             <div class="flex justify-center gap-2" style="margin-top: 2rem;">
@@ -238,9 +269,12 @@
             </div>
             <button class="btn btn-secondary" id="pomodoro-mode" style="margin-top: 1rem; width: 100%;">Switch to Break</button>
             
-            <div style="margin-top: 2rem; border-top: 1px solid var(--card-border); padding-top: 1rem;">
-              <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">Today's Sessions</h4>
-              <div id="pomodoro-sessions" style="display: flex; justify-content: center; gap: 5px; flex-wrap: wrap;"></div>
+            <div style="margin-top: 2rem; border-top: 1px solid var(--card-border); padding-top: 1rem; text-align: left;">
+              <div class="flex justify-between items-center" style="margin-bottom: 1rem;">
+                <h4 style="color: var(--text-main); margin: 0;">History (24h)</h4>
+                <span id="pomodoro-total-time" style="color: var(--primary-color); font-weight: 600;">0m Focused</span>
+              </div>
+              <div id="pomodoro-sessions" style="display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto;"></div>
             </div>
           </div>
         </section>
@@ -251,7 +285,7 @@
           <div class="card glass" style="max-width: 600px; margin-top: 2rem;">
             <div class="form-group flex justify-between items-center">
               <label class="form-label" style="margin: 0; font-size: 1rem; color: var(--text-main);">Dark Mode</label>
-              <input type="checkbox" checked style="width: 20px; height: 20px;">
+              <input type="checkbox" id="theme-toggle" checked style="width: 20px; height: 20px;">
             </div>
             <div class="form-group flex justify-between items-center">
               <label class="form-label" style="margin: 0; font-size: 1rem; color: var(--text-main);">Email Notifications</label>
@@ -260,11 +294,11 @@
             <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 2rem 0;">
             <h3 style="margin-bottom: 1rem;">Data Management</h3>
             <div class="flex gap-2">
-              <button class="btn btn-primary" onclick="alert('Exporting data as JSON...')"><i class="fa-solid fa-download"></i> Export Data</button>
-              <button class="btn btn-secondary" onclick="alert('Database backup initiated')"><i class="fa-solid fa-database"></i> Backup</button>
+              <button class="btn btn-primary" onclick="window.customAlert('Exporting data as JSON...')"><i class="fa-solid fa-download"></i> Export Data</button>
+              <button class="btn btn-secondary" onclick="window.customAlert('Database backup initiated')"><i class="fa-solid fa-database"></i> Backup</button>
             </div>
             <div style="margin-top: 2rem;">
-              <button class="btn btn-danger" onclick="if(confirm('Are you sure you want to delete your account?')) alert('Account deleted.')"><i class="fa-solid fa-trash"></i> Delete Account</button>
+              <button class="btn btn-danger" onclick="window.customConfirm('Are you sure you want to delete your account?').then(res => { if(res) window.customAlert('Account deleted.'); })"><i class="fa-solid fa-trash"></i> Delete Account</button>
             </div>
           </div>
         </section>

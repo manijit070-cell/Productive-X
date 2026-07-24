@@ -1,5 +1,5 @@
 import { api } from '../api.js';
-import { showToast } from '../components/ui.js';
+import { showToast, customPrompt, customConfirm } from '../components/ui.js';
 
 export async function initGoals() {
   const container = document.getElementById('module-goals');
@@ -13,9 +13,9 @@ export async function initGoals() {
 
   await loadGoals();
 
-  document.getElementById('btn-add-goal').onclick = () => {
-    const title = prompt("Enter goal title:");
-    const deadline = prompt("Enter deadline (YYYY-MM-DD):");
+  document.getElementById('btn-add-goal').onclick = async () => {
+    const title = await customPrompt("Enter goal title:");
+    const deadline = await customPrompt("Enter deadline (YYYY-MM-DD):");
     if(title && deadline) {
       api.createGoal({ title, deadline }).then(() => {
         showToast('Goal added');
@@ -60,7 +60,7 @@ async function loadGoals() {
             <button class="btn btn-delete" style="background:transparent; color:var(--text-muted); padding:0;"><i class="fa-solid fa-trash"></i></button>
           </div>
           
-          <div style="background: rgba(255,255,255,0.05); height: 12px; border-radius: 6px; overflow: hidden; margin-bottom: 1rem; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);">
+          <div style="background: var(--btn-secondary-bg); height: 12px; border-radius: 6px; overflow: hidden; margin-bottom: 1rem; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);">
             <div style="width: ${goal.progress}%; background: ${barColor}; height: 100%; transition: width 1s ease-in-out, background 0.5s;"></div>
           </div>
           
@@ -99,11 +99,13 @@ async function loadGoals() {
           };
         }
 
-        div.querySelector('.btn-delete').onclick = () => {
-          api.deleteGoal(goal._id).then(() => {
-            showToast('Goal deleted');
-            loadGoals();
-          });
+        div.querySelector('.btn-delete').onclick = async () => {
+          if(await customConfirm("Are you sure you want to delete this goal?")) {
+            api.deleteGoal(goal._id).then(() => {
+              showToast('Goal deleted');
+              loadGoals();
+            });
+          }
         };
 
         list.appendChild(div);

@@ -1,5 +1,5 @@
 import { api } from '../api.js';
-import { showToast } from '../components/ui.js';
+import { showToast, customPrompt, customConfirm } from '../components/ui.js';
 
 export async function initHabits() {
   const container = document.getElementById('module-habits');
@@ -13,8 +13,8 @@ export async function initHabits() {
 
   await loadHabits();
 
-  document.getElementById('btn-add-habit').onclick = () => {
-    const name = prompt("Enter habit name:");
+  document.getElementById('btn-add-habit').onclick = async () => {
+    const name = await customPrompt("Enter habit name:");
     if(name) {
       api.createHabit({ name }).then(() => {
         showToast('Habit added');
@@ -48,7 +48,7 @@ async function loadHabits() {
           d.setDate(d.getDate() - i);
           const done = trackedDates.some(td => new Date(td).toDateString() === d.toDateString());
           const h = done ? '100%' : '30%';
-          const color = done ? 'var(--success-color)' : 'rgba(255,255,255,0.1)';
+          const color = done ? 'var(--success-color)' : 'var(--glass-border-hover)';
           historyHtml += `<div style="flex:1; height:${h}; background:${color}; border-radius:3px;" title="${d.toDateString()}"></div>`;
         }
         historyHtml += '</div>';
@@ -72,11 +72,13 @@ async function loadHabits() {
           </button>
         `;
 
-        div.querySelector('.btn-delete').onclick = () => {
-          api.deleteHabit(habit._id).then(() => {
-            showToast('Habit deleted');
-            loadHabits();
-          });
+        div.querySelector('.btn-delete').onclick = async () => {
+          if(await customConfirm("Are you sure you want to delete this habit?")) {
+            api.deleteHabit(habit._id).then(() => {
+              showToast('Habit deleted');
+              loadHabits();
+            });
+          }
         };
 
         const checkBtn = div.querySelector('.btn-checkin');

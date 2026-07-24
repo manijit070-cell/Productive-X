@@ -1,5 +1,5 @@
 import { api } from '../api.js';
-import { showToast } from '../components/ui.js';
+import { showToast, customPrompt, customConfirm } from '../components/ui.js';
 
 let expenseChart = null;
 let allExpenses = [];
@@ -22,15 +22,15 @@ export async function initExpenses() {
     <div class="grid grid-cols-3 gap-4" style="margin-bottom: 2rem;">
       <div class="card glass text-center">
         <h3 style="color: var(--success-color)">Total Income</h3>
-        <h2 id="total-income">$0.00</h2>
+        <h2 id="total-income">₹0.00</h2>
       </div>
       <div class="card glass text-center">
         <h3 style="color: var(--danger-color)">Total Expense</h3>
-        <h2 id="total-expense">$0.00</h2>
+        <h2 id="total-expense">₹0.00</h2>
       </div>
       <div class="card glass text-center">
         <h3 style="color: var(--primary-color)">Balance</h3>
-        <h2 id="net-balance">$0.00</h2>
+        <h2 id="net-balance">₹0.00</h2>
       </div>
     </div>
 
@@ -48,9 +48,11 @@ export async function initExpenses() {
           <tbody id="expense-list"></tbody>
         </table>
       </div>
-      <div class="card glass">
+      <div class="card glass flex-col">
         <h3 style="margin-bottom: 1rem; text-align: center;">Expenses by Category</h3>
-        <canvas id="miniExpenseChart"></canvas>
+        <div style="position: relative; height: 300px; width: 100%; display: flex; justify-content: center; align-items: center;">
+          <canvas id="miniExpenseChart"></canvas>
+        </div>
       </div>
     </div>
   `;
@@ -62,10 +64,10 @@ export async function initExpenses() {
   document.getElementById('expense-filter').onchange = renderExpenses;
 }
 
-function showAddModal(type) {
-  const category = prompt(`Enter category for ${type} (e.g. Salary, Groceries):`);
+async function showAddModal(type) {
+  const category = await customPrompt(`Enter category for ${type} (e.g. Salary, Groceries):`);
   if(!category) return;
-  const amount = parseFloat(prompt("Enter amount:"));
+  const amount = parseFloat(await customPrompt("Enter amount:"));
   
   if(category && amount) {
     api.createExpense({ type, category, amount }).then(() => {
@@ -113,7 +115,7 @@ function renderExpenses() {
     }
 
     const tr = document.createElement('tr');
-    tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+    tr.style.borderBottom = '1px solid var(--card-border)';
     const color = exp.type === 'Income' ? 'var(--success-color)' : 'var(--danger-color)';
     const sign = exp.type === 'Income' ? '+' : '-';
     
@@ -123,25 +125,27 @@ function renderExpenses() {
         <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${color}; margin-right:8px;"></span>
         ${exp.category}
       </td>
-      <td style="padding: 1rem; font-weight: 600; color: ${color};">${sign}$${exp.amount.toFixed(2)}</td>
+      <td style="padding: 1rem; font-weight: 600; color: ${color};">${sign}₹${exp.amount.toFixed(2)}</td>
       <td style="padding: 1rem; text-align: right;">
         <button class="btn btn-secondary btn-delete" style="padding: 0.2rem 0.5rem; border-radius: 4px;"><i class="fa-solid fa-trash"></i></button>
       </td>
     `;
 
-    tr.querySelector('.btn-delete').onclick = () => {
-      api.deleteExpense(exp._id).then(() => {
-        showToast('Transaction deleted');
-        loadExpenses();
-      });
+    tr.querySelector('.btn-delete').onclick = async () => {
+      if(await customConfirm("Are you sure you want to delete this transaction?")) {
+        api.deleteExpense(exp._id).then(() => {
+          showToast('Transaction deleted');
+          loadExpenses();
+        });
+      }
     };
 
     list.appendChild(tr);
   });
 
-  document.getElementById('total-income').textContent = `$${income.toFixed(2)}`;
-  document.getElementById('total-expense').textContent = `$${expense.toFixed(2)}`;
-  document.getElementById('net-balance').textContent = `$${(income - expense).toFixed(2)}`;
+  document.getElementById('total-income').textContent = `₹${income.toFixed(2)}`;
+  document.getElementById('total-expense').textContent = `₹${expense.toFixed(2)}`;
+  document.getElementById('net-balance').textContent = `₹${(income - expense).toFixed(2)}`;
 
   updateChart(categoryTotals);
 }
@@ -167,14 +171,45 @@ function updateChart(categories) {
       datasets: [{
         data: data,
         backgroundColor: ['#EF4444', '#F59E0B', '#3B82F6', '#8B5CF6', '#EC4899', '#10B981'],
-        borderWidth: 0
+        borderWidth: 0,
+        borderRadius: 12,
+        spacing: 5,
+        hoverOffset: 15
       }]
     },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
       plugins: {
-        legend: { display: false }
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            color: getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim(),
+            padding: 20,
+            font: { family: "'Poppins', sans-serif" }
+          }
+        },
+        tooltip: {
+          backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--chart-tooltip-bg').trim(),
+          titleColor: getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim(),
+          bodyColor: getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim(),
+          borderColor: getComputedStyle(document.documentElement).getPropertyValue('--card-border').trim(),
+          borderWidth: 1,
+          padding: 12,
+          cornerRadius: 8
+        }
       },
-      cutout: '70%'
+      cutout: '80%',
+      layout: {
+        padding: 10
+      }
     }
   });
 }
+
+window.addEventListener('themeChanged', () => {
+  if (document.getElementById('module-expenses').classList.contains('active')) {
+    renderExpenses();
+  }
+});

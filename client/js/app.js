@@ -64,6 +64,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('sidebar').classList.toggle('active');
   });
 
+  // Theme Logic
+  const themeBtn = document.getElementById('theme-toggle-btn');
+  const themeCheckbox = document.getElementById('theme-toggle'); // Settings checkbox
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    
+    if (theme === 'light') {
+      themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+      if(themeCheckbox) themeCheckbox.checked = false;
+    } else {
+      themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+      if(themeCheckbox) themeCheckbox.checked = true;
+    }
+    
+    window.dispatchEvent(new Event('themeChanged'));
+  }
+
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  setTheme(savedTheme);
+
+  themeBtn.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    setTheme(current === 'light' ? 'dark' : 'light');
+  });
+
+  if (themeCheckbox) {
+    themeCheckbox.addEventListener('change', (e) => {
+      setTheme(e.target.checked ? 'dark' : 'light');
+    });
+  }
+
   // Initial load
   loadDashboard();
 });
@@ -78,7 +111,7 @@ async function loadDashboard() {
       const tasks = tasksRes.data;
 
       document.getElementById('dash-pending-tasks').textContent = data.pendingTasks;
-      document.getElementById('dash-balance').textContent = `$${data.finance.balance}`;
+      document.getElementById('dash-balance').textContent = `₹${data.finance.balance}`;
       document.getElementById('dash-active-goals').textContent = data.activeGoals.length;
       document.getElementById('dash-habits-tracked').textContent = data.habits.length;
 
