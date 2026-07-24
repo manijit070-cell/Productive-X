@@ -149,6 +149,51 @@ ul {
   .sidebar.active { transform: translateX(0); }
   .main-content { margin-left: 0; }
   .grid-cols-4, .grid-cols-3, .grid-cols-2 { grid-template-columns: 1fr; }
+  
+  /* Mobile De-congestion Improvements */
+  .content-area {
+    padding: 1rem;
+    margin-top: 60px;
+  }
+  .navbar {
+    height: 60px;
+    padding: 0 1rem;
+  }
+  
+  /* Reduce gaps in flex/grid */
+  .gap-4 { gap: 1rem; }
+  .gap-3 { gap: 0.75rem; }
+  .gap-2 { gap: 0.5rem; }
+  
+  /* Reduce card padding */
+  .card { padding: 1rem !important; }
+  
+  /* Make Kanban horizontally scrollable */
+  #kanban-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 1rem;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding: 1rem;
+  }
+  #kanban-container .kanban-column {
+    min-width: 85vw;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    margin-right: 1rem;
+  }
+  #kanban-container .kanban-column:last-child {
+    margin-right: 0;
+  }
+  
+  /* Hide user name on small screens */
+  #user-name-display { display: none; }
+  
+  /* Adjust Typography */
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.2rem; }
 }
 
 /* --- AI Coach Chat Bot --- */
