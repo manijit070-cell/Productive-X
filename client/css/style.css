@@ -329,9 +329,9 @@ ul {
 }
 
 #ai-chat-panel {
-  position: absolute;
-  bottom: 85px;
-  right: 0;
+  position: fixed;
+  bottom: 117px;
+  right: 2rem;
   width: 360px;
   height: 480px;
   background: rgba(10, 15, 25, 0.85);
