@@ -30,29 +30,30 @@ export function initAI() {
       if (!AudioContext) return;
       const ctx = new AudioContext();
       
-      function playTone(freq, startTime, duration) {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, startTime);
-        
-        // Drastically reduced volume (0.005 instead of 0.02) for a whisper-quiet sound
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.005, startTime + 0.05); // Whisper quiet attack
-        gain.gain.setValueAtTime(0.005, startTime + duration - 0.4); // Hold
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration); // Smooth fade out
-        
-        osc.start(startTime);
-        osc.stop(startTime + duration);
-      }
-
       const now = ctx.currentTime;
-      // Very soft, simple two-note harmonious chime (A4 -> C#5) instead of a busy 4-note chord
-      playTone(440, now, 0.6); 
-      playTone(554.37, now + 0.1, 0.6);
+      const osc = ctx.createOscillator();
+      const filter = ctx.createBiquadFilter();
+      const gain = ctx.createGain();
+      
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      
+      // Use a triangle wave (warmer than sine) at a low pitch (A3)
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(220, now); 
+      
+      // Muffle the sound completely by cutting off all high/shrill frequencies
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(300, now);
+      
+      // Soft envelope
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.05, now + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      
+      osc.start(now);
+      osc.stop(now + 0.5);
     } catch(e) {}
   }
 
