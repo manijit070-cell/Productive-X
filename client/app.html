@@ -146,7 +146,6 @@
     <div class="main-content">
       <!-- Navbar -->
       <header class="navbar">
-        <div class="mobile-toggle" id="mobile-toggle"><i class="fa-solid fa-bars"></i></div>
         <h2 id="page-title">Dashboard</h2>
         <div class="flex items-center gap-4">
           <button id="theme-toggle-btn" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--card-border); background: var(--btn-secondary-bg); color: var(--text-main);">
@@ -440,6 +439,60 @@
         </button>
         <input type="text" id="ai-chat-input" placeholder="Ask about your plan...">
         <button id="ai-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <div class="bottom-nav-item active" data-target="dashboard">
+      <i class="fa-solid fa-chart-pie"></i>
+      <span>Dash</span>
+    </div>
+    <div class="bottom-nav-item" data-target="tasks">
+      <i class="fa-solid fa-list-check"></i>
+      <span>Tasks</span>
+    </div>
+    <div class="bottom-nav-item" data-target="pomodoro">
+      <i class="fa-solid fa-clock"></i>
+      <span>Focus</span>
+    </div>
+    <div class="bottom-nav-item" data-target="fitness">
+      <i class="fa-solid fa-dumbbell"></i>
+      <span>Coach</span>
+    </div>
+    <div class="bottom-nav-item" id="btn-mobile-more">
+      <i class="fa-solid fa-ellipsis"></i>
+      <span>More</span>
+    </div>
+  </nav>
+
+  <!-- Mobile More Menu Modal -->
+  <div class="modal-overlay" id="mobile-more-modal">
+    <div class="modal-content" style="padding: 1.5rem; padding-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="margin: 0;">More</h3>
+        <i class="fa-solid fa-times" id="btn-close-more" style="cursor: pointer; font-size: 1.2rem; color: var(--text-muted);"></i>
+      </div>
+      <div class="mobile-more-grid">
+        <div class="mobile-more-item" data-target="expenses">
+          <i class="fa-solid fa-wallet"></i> Expenses
+        </div>
+        <div class="mobile-more-item" data-target="goals">
+          <i class="fa-solid fa-bullseye"></i> Goals
+        </div>
+        <div class="mobile-more-item" data-target="habits">
+          <i class="fa-solid fa-calendar-check"></i> Habits
+        </div>
+        <div class="mobile-more-item" data-target="notes">
+          <i class="fa-solid fa-sticky-note"></i> Notes
+        </div>
+        <div class="mobile-more-item" data-target="settings">
+          <i class="fa-solid fa-gear"></i> Settings
+        </div>
+        <div class="mobile-more-item text-danger" id="mobile-logout-btn" style="color: var(--danger-color);">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </div>
       </div>
     </div>
   </div>

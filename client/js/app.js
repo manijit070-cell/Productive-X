@@ -22,16 +22,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Navigation Logic
-  const navItems = document.querySelectorAll('.nav-item[data-target]');
+  const navItems = document.querySelectorAll('.nav-item[data-target], .bottom-nav-item[data-target], .mobile-more-item[data-target]');
   const sections = document.querySelectorAll('.module-section');
   const pageTitle = document.getElementById('page-title');
   const loadedModules = new Set();
+  
+  const mobileMoreModal = document.getElementById('mobile-more-modal');
 
   navItems.forEach(item => {
     item.addEventListener('click', () => {
-      // Update active nav
-      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-      item.classList.add('active');
+      // Update active nav (both desktop and mobile)
+      document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(nav => nav.classList.remove('active'));
+      
+      // If a 'more' item was clicked, highlight the 'More' tab in bottom nav
+      if (item.classList.contains('mobile-more-item')) {
+        document.getElementById('btn-mobile-more').classList.add('active');
+      } else {
+        item.classList.add('active');
+      }
 
       // Update active section
       const target = item.getAttribute('data-target');
@@ -41,9 +49,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Update Title
       pageTitle.textContent = item.textContent.trim();
 
-      // Mobile: close sidebar on click
-      if (window.innerWidth <= 768) {
-        document.getElementById('sidebar').classList.remove('active');
+      // Mobile: close more modal if open
+      if (mobileMoreModal && mobileMoreModal.classList.contains('active')) {
+        mobileMoreModal.classList.remove('active');
       }
 
       // Load specific module data if needed
@@ -62,15 +70,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Logout
-  document.getElementById('logout-btn').addEventListener('click', () => {
+  function handleLogout() {
     api.setToken(null);
     window.location.href = '/index.html';
-  });
+  }
+  document.getElementById('logout-btn').addEventListener('click', handleLogout);
+  if (document.getElementById('mobile-logout-btn')) {
+    document.getElementById('mobile-logout-btn').addEventListener('click', handleLogout);
+  }
 
-  // Mobile Toggle
-  document.getElementById('mobile-toggle').addEventListener('click', () => {
-    document.getElementById('sidebar').classList.toggle('active');
-  });
+  // Mobile More Modal Toggle
+  const btnMobileMore = document.getElementById('btn-mobile-more');
+  const btnCloseMore = document.getElementById('btn-close-more');
+  
+  if (btnMobileMore && btnCloseMore && mobileMoreModal) {
+    btnMobileMore.addEventListener('click', () => {
+      mobileMoreModal.classList.add('active');
+    });
+    btnCloseMore.addEventListener('click', () => {
+      mobileMoreModal.classList.remove('active');
+    });
+    mobileMoreModal.addEventListener('click', (e) => {
+      if (e.target === mobileMoreModal) {
+        mobileMoreModal.classList.remove('active');
+      }
+    });
+  }
 
   // Theme Logic
   const themeBtn = document.getElementById('theme-toggle-btn');

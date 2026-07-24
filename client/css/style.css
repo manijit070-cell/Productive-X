@@ -145,19 +145,19 @@ ul {
 }
 
 @media (max-width: 768px) {
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.active { transform: translateX(0); }
-  .main-content { margin-left: 0; }
+  .sidebar { display: none !important; }
+  .main-content { margin-left: 0; padding-bottom: 70px; } /* Padding for bottom nav */
   .grid-cols-4, .grid-cols-3, .grid-cols-2 { grid-template-columns: 1fr; }
   
   /* Mobile De-congestion Improvements */
   .content-area {
-    padding: 1rem;
+    padding: 1rem 0.5rem; /* Edge to edge */
     margin-top: 60px;
   }
   .navbar {
     height: 60px;
     padding: 0 1rem;
+    left: 0;
   }
   
   /* Reduce gaps in flex/grid */
@@ -166,7 +166,7 @@ ul {
   .gap-2 { gap: 0.5rem; }
   
   /* Reduce card padding */
-  .card { padding: 1rem !important; }
+  .card { padding: 1.25rem 1rem !important; }
   
   /* Make Kanban horizontally scrollable */
   #kanban-container {
@@ -175,7 +175,7 @@ ul {
     scroll-snap-type: x mandatory;
     padding-bottom: 1rem;
     -webkit-overflow-scrolling: touch;
-    scroll-padding: 1rem;
+    scroll-padding: 0.5rem;
   }
   #kanban-container .kanban-column {
     min-width: 85vw;
@@ -194,6 +194,85 @@ ul {
   h1 { font-size: 1.75rem; }
   h2 { font-size: 1.5rem; }
   h3 { font-size: 1.2rem; }
+}
+
+/* --- Bottom Navigation --- */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background-color: var(--nav-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--card-border);
+  z-index: 900;
+  justify-content: space-around;
+  align-items: center;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  gap: 4px;
+  width: 20%;
+  height: 100%;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.bottom-nav-item i {
+  font-size: 1.2rem;
+}
+
+.bottom-nav-item span {
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.bottom-nav-item.active {
+  color: var(--primary-color);
+}
+
+/* --- Mobile More Menu Grid --- */
+.mobile-more-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.mobile-more-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 1rem 0.5rem;
+  color: var(--text-main);
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobile-more-item i {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.mobile-more-item:hover, .mobile-more-item:active {
+  background: var(--btn-secondary-hover);
+}
+
+@media (max-width: 768px) {
+  .bottom-nav { display: flex; }
 }
 
 /* --- AI Coach Chat Bot --- */
@@ -379,4 +458,25 @@ ul {
 #ai-chat-send:hover {
   transform: scale(1.05);
   box-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
+}
+
+@media (max-width: 768px) {
+  #ai-chat-bot-container {
+    bottom: 85px; /* Above the bottom nav */
+    right: 1rem;
+  }
+  
+  #ai-chat-bot-icon {
+    width: 55px;
+    height: 55px;
+    font-size: 1.4rem;
+  }
+  
+  #ai-chat-panel {
+    bottom: 65px;
+    right: 0;
+    width: 320px;
+    height: 400px;
+    max-height: 70vh;
+  }
 }
