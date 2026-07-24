@@ -67,13 +67,44 @@ async function loadTasks() {
             dateHtml = `<span style="font-size: 0.75rem; color: ${color};"><i class="fa-regular fa-clock"></i> ${new Date(task.dueDate).toLocaleDateString()}</span>`;
           }
 
+          const statuses = ['To Do', 'In Progress', 'Review', 'Completed'];
+          const currentIndex = statuses.indexOf(task.status);
+          const hasPrev = currentIndex > 0;
+          const hasNext = currentIndex < statuses.length - 1;
+
           div.innerHTML = `
             <div style="font-weight: 500; margin-bottom: 0.5rem;" class="task-title">${task.title}</div>
             <div class="flex justify-between items-center">
               ${dateHtml}
-              <button class="btn btn-secondary btn-delete" style="padding: 0.2rem 0.5rem; font-size: 0.8rem"><i class="fa-solid fa-trash"></i></button>
+              <div class="task-actions flex gap-1">
+                <button class="btn btn-secondary btn-move-prev mobile-only" style="padding: 0.2rem 0.5rem; font-size: 0.8rem" ${!hasPrev ? 'disabled style="opacity: 0.3"' : ''}><i class="fa-solid fa-arrow-up"></i></button>
+                <button class="btn btn-secondary btn-move-next mobile-only" style="padding: 0.2rem 0.5rem; font-size: 0.8rem" ${!hasNext ? 'disabled style="opacity: 0.3"' : ''}><i class="fa-solid fa-arrow-down"></i></button>
+                <button class="btn btn-secondary btn-delete" style="padding: 0.2rem 0.5rem; font-size: 0.8rem"><i class="fa-solid fa-trash"></i></button>
+              </div>
             </div>
           `;
+          
+          const btnPrev = div.querySelector('.btn-move-prev');
+          if (btnPrev && hasPrev) {
+            btnPrev.onclick = async () => {
+              try {
+                await api.updateTask(task._id, { status: statuses[currentIndex - 1] });
+                loadTasks();
+              } catch(err) { showToast('Failed', 'error'); }
+            };
+          }
+
+          const btnNext = div.querySelector('.btn-move-next');
+          if (btnNext && hasNext) {
+            btnNext.onclick = async () => {
+              const newStatus = statuses[currentIndex + 1];
+              try {
+                await api.updateTask(task._id, { status: newStatus });
+                if (newStatus === 'Completed') confetti({ particleCount: 50, spread: 60 });
+                loadTasks();
+              } catch(err) { showToast('Failed', 'error'); }
+            };
+          }
           
           // Inline edit on double click
           div.querySelector('.task-title').ondblclick = (e) => {
@@ -127,6 +158,7 @@ function initSortable() {
       group: 'shared',
       animation: 150,
       ghostClass: 'sortable-ghost',
+      disabled: window.innerWidth <= 768, // Disable drag-and-drop on mobile
       onEnd: async function (evt) {
         const itemEl = evt.item;
         const taskId = itemEl.getAttribute('data-id');
