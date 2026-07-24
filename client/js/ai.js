@@ -21,6 +21,7 @@ export function initAI() {
   let currentUtterance = null; // Fix Chrome GC bug for speech synthesis
   let finalCommand = "";
   let silenceTimeout = null;
+  let restartTimeout = null;
   const WAKE_WORDS = ['coach', 'couch', 'catch', 'poach', 'cotch', 'gooch'];
 
   function activateListeningMode() {
