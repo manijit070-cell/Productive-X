@@ -105,7 +105,7 @@ export function initAI() {
     }
 
     recognition = new webkitSpeechRecognition();
-    recognition.continuous = false; // Fixes Android Chrome text duplication bug
+    recognition.continuous = true; // Stay on to prevent constant mic restarting and beeping
     recognition.interimResults = true; // Enable real-time transcript
     recognition.lang = 'en-US';
 
