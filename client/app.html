@@ -393,6 +393,18 @@
               <input type="checkbox" checked style="width: 20px; height: 20px;">
             </div>
             <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 2rem 0;">
+            <h3 style="margin-bottom: 1rem;">AI Assistant</h3>
+            <div class="form-group">
+              <label class="form-label" style="font-size: 1rem; color: var(--text-main);">Sage's Voice</label>
+              <div class="flex gap-2">
+                <select id="ai-voice-select" class="form-control" style="flex: 1;">
+                  <option value="">Loading voices...</option>
+                </select>
+                <button class="btn btn-secondary" id="btn-test-voice"><i class="fa-solid fa-volume-high"></i> Test</button>
+              </div>
+            </div>
+            
+            <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 2rem 0;">
             <h3 style="margin-bottom: 1rem;">Data Management</h3>
             <div class="flex gap-2">
               <button class="btn btn-primary" id="btn-export-fitness"><i class="fa-solid fa-file-csv"></i> Export Fitness History</button>

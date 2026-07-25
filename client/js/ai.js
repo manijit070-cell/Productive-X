@@ -444,10 +444,63 @@ export function initAI() {
     // Optional: wait for voices to load if they aren't yet
     let voices = window.speechSynthesis.getVoices();
     if (voices.length > 0) {
-      const best = voices.find(v => v.lang.includes('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha')));
-      if (best) currentUtterance.voice = best;
+      const savedVoiceName = localStorage.getItem('ai_preferred_voice');
+      let selected = null;
+      if (savedVoiceName) {
+        selected = voices.find(v => v.name === savedVoiceName);
+      }
+      if (!selected) {
+        selected = voices.find(v => v.lang.includes('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha')));
+      }
+      if (selected) currentUtterance.voice = selected;
     }
     
     window.speechSynthesis.speak(currentUtterance);
   }
 }
+
+// --- Voice Selection Settings ---
+function initVoiceSettings() {
+  const select = document.getElementById('ai-voice-select');
+  const testBtn = document.getElementById('btn-test-voice');
+  if (!select || !testBtn) return;
+
+  function populateVoices() {
+    let voices = window.speechSynthesis.getVoices().filter(v => v.lang.includes('en'));
+    if (voices.length === 0) return;
+    
+    select.innerHTML = '';
+    voices.forEach((v) => {
+      const option = document.createElement('option');
+      option.value = v.name;
+      option.textContent = `${v.name} (${v.lang})`;
+      select.appendChild(option);
+    });
+
+    const savedVoice = localStorage.getItem('ai_preferred_voice');
+    if (savedVoice) {
+      select.value = savedVoice;
+    }
+  }
+
+  populateVoices();
+  if (window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = populateVoices;
+  }
+
+  select.onchange = () => {
+    localStorage.setItem('ai_preferred_voice', select.value);
+  };
+
+  testBtn.onclick = () => {
+    const utterance = new SpeechSynthesisUtterance("Hello, I am Sage. How can I assist you today?");
+    const voices = window.speechSynthesis.getVoices();
+    const selectedVoice = voices.find(v => v.name === select.value);
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+    }
+    window.speechSynthesis.speak(utterance);
+  };
+}
+
+document.addEventListener('DOMContentLoaded', initVoiceSettings);
