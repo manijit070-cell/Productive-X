@@ -114,6 +114,8 @@ export function initAI() {
       botIcon.style.boxShadow = '0 0 20px rgba(52, 211, 153, 0.6)'; // Green glow when engine active
     };
 
+    let speechTimeout = null;
+
     recognition.onresult = (event) => {
       if (isSpeaking) return; // Prevent AI from listening to its own voice
       
@@ -136,6 +138,23 @@ export function initAI() {
          activateListeningMode();
       }
 
+      function submitCommand(cmd) {
+        if (cmd.length > 0) {
+          wakeWordTriggered = false; // Reset for next sentence
+          manualVoice = false;
+          clearTimeout(manualVoiceTimeout);
+          clearTimeout(speechTimeout);
+          
+          if (botIcon) botIcon.classList.add('ai-processing');
+          showOverlay(cmd, 'processing');
+          
+          try { recognition.abort(); } catch(e){} // Stop mic to avoid noise
+          processCommand(cmd, true);
+        } else {
+          activateListeningMode();
+        }
+      }
+
       // Wake word or manual check
       if (manualVoice || wakeWordTriggered) {
         let command = transcript;
@@ -148,20 +167,12 @@ export function initAI() {
         showOverlay(command || "Listening...", 'listening');
 
         if (isFinal) {
+          submitCommand(command);
+        } else {
+          // Auto-submit after 2 seconds of silence for mobile browsers where isFinal is unreliable
+          clearTimeout(speechTimeout);
           if (command.length > 0) {
-            wakeWordTriggered = false; // Reset for next sentence
-            manualVoice = false;
-            clearTimeout(manualVoiceTimeout);
-            
-            if (botIcon) botIcon.classList.add('ai-processing');
-            showOverlay(command, 'processing');
-            
-            try { recognition.abort(); } catch(e){} // Stop mic to avoid noise
-            processCommand(command, true);
-          } else {
-            // They said wake word but paused before giving command.
-            // Engine will naturally restart via onend, keep listening mode active.
-            activateListeningMode(); 
+            speechTimeout = setTimeout(() => submitCommand(command), 2000);
           }
         }
       }
@@ -173,6 +184,7 @@ export function initAI() {
       }
       if (event.error === 'not-allowed' || event.error === 'audio-capture') {
         isListening = false;
+        window.hasMicPermissionError = true;
         clearTimeout(restartTimeout); // Fatal error, do not restart
       }
     };
@@ -232,14 +244,18 @@ export function initAI() {
       }
       document.removeEventListener('click', startOnInteraction);
       document.removeEventListener('keydown', startOnInteraction);
+      document.removeEventListener('touchstart', startOnInteraction);
     };
     
     document.addEventListener('click', startOnInteraction);
     document.addEventListener('keydown', startOnInteraction);
+    document.addEventListener('touchstart', startOnInteraction, {passive: true});
+    
+    window.hasMicPermissionError = false;
     
     // Watchdog Pacemaker to ensure it NEVER stays dead
     setInterval(() => {
-      if ('webkitSpeechRecognition' in window && !isListening && !isSpeaking) {
+      if ('webkitSpeechRecognition' in window && !isListening && !isSpeaking && !window.hasMicPermissionError) {
         try { 
           recognition.start(); 
         } catch(e) {
@@ -466,19 +482,28 @@ function initVoiceSettings() {
   if (!select || !testBtn) return;
 
   function populateVoices() {
-    let voices = window.speechSynthesis.getVoices().filter(v => v.lang.includes('en'));
+    let voices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
+    
+    // Filter out novelty voices and keep only standard/premium ones
+    const allowed = ['google', 'microsoft', 'siri', 'samantha', 'alex', 'daniel', 'karen', 'moira', 'rishi', 'tessa'];
+    voices = voices.filter(v => v.default || allowed.some(p => v.name.toLowerCase().includes(p)));
+
     if (voices.length === 0) return;
     
     select.innerHTML = '';
+    const seen = new Set();
     voices.forEach((v) => {
-      const option = document.createElement('option');
-      option.value = v.name;
-      option.textContent = `${v.name} (${v.lang})`;
-      select.appendChild(option);
+      if (!seen.has(v.name)) {
+        seen.add(v.name);
+        const option = document.createElement('option');
+        option.value = v.name;
+        option.textContent = `${v.name} (${v.lang})`;
+        select.appendChild(option);
+      }
     });
 
     const savedVoice = localStorage.getItem('ai_preferred_voice');
-    if (savedVoice) {
+    if (savedVoice && seen.has(savedVoice)) {
       select.value = savedVoice;
     }
   }
