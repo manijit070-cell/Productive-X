@@ -370,11 +370,8 @@
               </div>
             </div>
 
-            <!-- Full Plan Modal/Toggle Button & Export Button -->
-            <div class="flex gap-2" style="margin-top: 1.5rem;">
-              <button class="btn btn-secondary" id="btn-view-full-plan"><i class="fa-solid fa-calendar-week"></i> View Full Weekly Plan</button>
-              <button class="btn btn-secondary" id="btn-export-fitness"><i class="fa-solid fa-file-csv"></i> Export History (CSV)</button>
-            </div>
+            <!-- Full Plan Modal/Toggle Button -->
+            <button class="btn btn-secondary" id="btn-view-full-plan" style="margin-top: 1.5rem;"><i class="fa-solid fa-calendar-week"></i> View Full Weekly Plan</button>
             <div id="full-plan-container" style="display: none; margin-top: 1rem; position: relative;" class="card glass">
                <div id="full-plan-content"></div>
             </div>
@@ -398,7 +395,7 @@
             <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 2rem 0;">
             <h3 style="margin-bottom: 1rem;">Data Management</h3>
             <div class="flex gap-2">
-              <button class="btn btn-primary" onclick="window.customAlert('Exporting data as JSON...')"><i class="fa-solid fa-download"></i> Export Data</button>
+              <button class="btn btn-primary" id="btn-export-fitness"><i class="fa-solid fa-file-csv"></i> Export Fitness History</button>
               <button class="btn btn-secondary" onclick="window.customAlert('Database backup initiated')"><i class="fa-solid fa-database"></i> Backup</button>
             </div>
             <div style="margin-top: 2rem;">

@@ -80,7 +80,15 @@ export async function initFitness() {
   
   const exportBtn = document.getElementById('btn-export-fitness');
   if (exportBtn) {
-    exportBtn.onclick = () => {
+    exportBtn.onclick = async () => {
+      // If data hasn't been loaded in this session, fetch it
+      if (!fitnessData) {
+        const res = await api.getFitnessProfile();
+        if (res && res.success) {
+          fitnessData = res.data;
+        }
+      }
+      
       if (!fitnessData || !fitnessData.logs || fitnessData.logs.length === 0) {
         showToast('No logged data to export yet.', 'error');
         return;
