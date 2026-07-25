@@ -230,6 +230,15 @@ export function initAI() {
 
     // Browser security blocks mic on load. We start it on the very first click/keypress anywhere on the site.
     const startOnInteraction = () => {
+      // KEEP MIC HOT HACK: Holding a silent audio stream keeps the OS microphone active. 
+      // This prevents Android from forcefully killing SpeechRecognition during silence,
+      // and eliminates the system beep when SpeechRecognition restarts because the mic hardware is already warm.
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then(stream => { window.persistentMicStream = stream; })
+          .catch(e => {});
+      }
+
       if (!isListening) {
         try { 
           recognition.start(); 
