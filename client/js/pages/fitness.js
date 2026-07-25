@@ -112,14 +112,27 @@ function renderFitnessUI() {
     // Show dashboard
     onboarding.style.display = 'none';
     dashboard.style.display = 'block';
-    
+    // Check if logged today
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const todayLog = fitnessData.logs.find(l => {
+      const logDate = new Date(l.date);
+      logDate.setHours(0,0,0,0);
+      return logDate.getTime() === today.getTime();
+    });
+
     // Parse Nutrition
     const nutrition = fitnessData.plan.nutritionPlan;
     if (nutrition) {
-      document.getElementById('fit-calories').textContent = `${nutrition.dailyCalories} kcal`;
-      document.getElementById('fit-protein').textContent = `${nutrition.proteinGrams}g`;
-      document.getElementById('fit-carbs').textContent = `${nutrition.carbsGrams}g`;
-      document.getElementById('fit-fat').textContent = `${nutrition.fatGrams}g`;
+      const loggedCals = todayLog?.caloriesConsumed || 0;
+      const loggedPro = todayLog?.proteinConsumed || 0;
+      const loggedCarbs = todayLog?.carbsConsumed || 0;
+      const loggedFat = todayLog?.fatConsumed || 0;
+
+      document.getElementById('fit-calories').textContent = `${loggedCals} / ${nutrition.dailyCalories} kcal`;
+      document.getElementById('fit-protein').textContent = `${loggedPro} / ${nutrition.proteinGrams}g`;
+      document.getElementById('fit-carbs').textContent = `${loggedCarbs} / ${nutrition.carbsGrams}g`;
+      document.getElementById('fit-fat').textContent = `${loggedFat} / ${nutrition.fatGrams}g`;
     }
     
     // Parse Today's Workout
@@ -137,15 +150,6 @@ function renderFitnessUI() {
       const li = document.createElement('li');
       li.textContent = ex;
       ul.appendChild(li);
-    });
-
-    // Check if logged today
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    const todayLog = fitnessData.logs.find(l => {
-      const logDate = new Date(l.date);
-      logDate.setHours(0,0,0,0);
-      return logDate.getTime() === today.getTime();
     });
 
     const logBtn = document.getElementById('btn-log-workout');
