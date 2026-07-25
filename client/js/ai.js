@@ -110,13 +110,14 @@ export function initAI() {
     recognition.interimResults = true; // Enable real-time transcript
     recognition.lang = 'en-US';
 
-    recognition.onstart = () => {
-      isListening = true;
-      botIcon.style.boxShadow = '0 0 20px rgba(52, 211, 153, 0.6)'; // Green glow when engine active
-    };
-
     let silenceTimer = null;
     let lastProcessedIndex = 0;
+
+    recognition.onstart = () => {
+      isListening = true;
+      lastProcessedIndex = 0; // Reset index because event.results is cleared by the browser on new session
+      botIcon.style.boxShadow = '0 0 20px rgba(52, 211, 153, 0.6)'; // Green glow when engine active
+    };
 
     recognition.onresult = (event) => {
       if (isSpeaking) return; // Prevent AI from listening to its own voice
