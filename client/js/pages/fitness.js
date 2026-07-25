@@ -27,7 +27,7 @@ export async function initFitness() {
     try {
       const btn = document.getElementById('btn-log-workout');
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
-      const res = await api.logFitnessProgress({ completedWorkout: true });
+      const res = await api.logFitnessData({ completedWorkout: true });
       if (res.success) {
         showToast('Workout completed! Great job!', 'success');
         fitnessData = res.data;
@@ -56,7 +56,7 @@ export async function initFitness() {
         carbsConsumed: isNaN(carbs) ? undefined : carbs,
         fatConsumed: isNaN(fat) ? undefined : fat,
       };
-      const res = await api.logFitnessProgress(payload);
+      const res = await api.logFitnessData(payload);
       if (res.success) {
         showToast('Nutrition logged!');
         document.getElementById('fit-log-calories').value = '';
