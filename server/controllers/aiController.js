@@ -14,7 +14,7 @@ exports.processCommand = async (req, res) => {
       return res.status(400).json({ success: false, message: 'No command provided' });
     }
 
-    const prompt = `You are "Coach", an elite global AI assistant for a productivity and fitness app called ProductiveX.
+    const prompt = `You are "Sage", an elite global AI assistant for a productivity and fitness app called ProductiveX.
 The user just said this to you: "${command}"
 
 Your job is to parse their intent and return a STRICT JSON object telling the frontend what to do.
@@ -44,7 +44,7 @@ Rules:
 - If they ask to pause or stop the timer, use PAUSE_POMODORO.
 - If they ask to reset the timer, use RESET_POMODORO.
 - If they ask to change or edit their workout, fitness, or nutrition plan, use EDIT_FITNESS.
-- If it's a general question or greeting (e.g. "Hey Coach", "How are you"), use CHAT.
+- If it's a general question or greeting (e.g. "Hey Sage", "How are you"), use CHAT.
 - Be concise.
 `;
 

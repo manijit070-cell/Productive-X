@@ -20,7 +20,7 @@ export function initAI() {
   let manualVoiceTimeout = null;
   let currentUtterance = null; // Fix Chrome GC bug for speech synthesis
   let restartTimeout = null;
-  const WAKE_WORDS = ['coach', 'couch', 'catch', 'poach', 'cotch', 'gooch'];
+  const WAKE_WORDS = ['sage', 'page', 'stage', 'cage', 'gauge', 'say'];
 
   function playBeep() {
     try {
@@ -354,8 +354,8 @@ export function initAI() {
       if (navItem) navItem.click();
       
       const loadingId = 'loading-' + Date.now();
-      appendChatMessage('assistant', '<i class="fa-solid fa-spinner fa-spin"></i> Consulting Fitness Coach...', loadingId);
-      showOverlay('Consulting Fitness Coach...', 'speaking');
+      appendChatMessage('assistant', '<i class="fa-solid fa-spinner fa-spin"></i> Consulting Sage...', loadingId);
+      showOverlay('Consulting Sage...', 'speaking');
       
       api.editFitnessPlan(payload.prompt || "Change my plan").then(res => {
         document.getElementById(loadingId)?.remove();
@@ -372,7 +372,7 @@ export function initAI() {
         }
       }).catch(e => {
          document.getElementById(loadingId)?.remove();
-         appendChatMessage('assistant', 'Network error reaching the fitness coach.');
+         appendChatMessage('assistant', 'Network error reaching Sage.');
          hideOverlay();
       });
     }

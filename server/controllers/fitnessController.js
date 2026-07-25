@@ -140,7 +140,7 @@ const generatePlan = async (req, res) => {
     // Clear chat history when generating a brand new plan
     fitnessData.chatHistory = [{
       role: 'assistant',
-      content: "Hi! I'm your AI Coach. I just generated your new plan. Let me know if you need any adjustments or have any questions!"
+      content: "Hi! I'm Sage, your AI assistant. I just generated your new plan. Let me know if you need any adjustments or have any questions!"
     }];
     
     await fitnessData.save();
@@ -299,7 +299,7 @@ const editPlan = async (req, res) => {
     res.status(200).json({ success: true, data: fitnessData });
   } catch (error) {
     console.error('AI Edit Error:', error);
-    res.status(500).json({ success: false, message: 'Failed to chat with coach. Please ensure your Groq key is working.' });
+    res.status(500).json({ success: false, message: 'Failed to chat with Sage. Please ensure your Groq key is working.' });
   }
 };
 

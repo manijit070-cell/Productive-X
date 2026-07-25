@@ -278,7 +278,7 @@ ul {
   .bottom-nav { display: flex; }
 }
 
-/* --- AI Coach Chat Bot --- */
+/* --- Sage Chat Bot --- */
 #ai-chat-bot-container {
   position: fixed;
   bottom: 2rem;
