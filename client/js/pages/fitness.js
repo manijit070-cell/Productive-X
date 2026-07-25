@@ -88,7 +88,7 @@ export async function initFitness() {
       
       const target = fitnessData.plan?.nutritionPlan || {};
       
-      let csvContent = "data:text/csv;charset=utf-8,";
+      let csvContent = "";
       csvContent += "Date,Workout Completed,Target Calories,Consumed Calories,Target Protein,Consumed Protein,Target Carbs,Consumed Carbs,Target Fat,Consumed Fat,Notes\n";
       
       fitnessData.logs.forEach(log => {
@@ -107,13 +107,15 @@ export async function initFitness() {
         csvContent += `${d},${workout},${tCals},${cCals},${tPro},${cPro},${tCarbs},${cCarbs},${tFat},${cFat},${notes}\n`;
       });
       
-      const encodedUri = encodeURI(csvContent);
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
+      link.setAttribute("href", url);
       link.setAttribute("download", "fitness_history.csv");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
       showToast('Export successful!', 'success');
     };
   }
