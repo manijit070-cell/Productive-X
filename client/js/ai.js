@@ -106,7 +106,7 @@ export function initAI() {
     }
 
     recognition = new webkitSpeechRecognition();
-    recognition.continuous = true; // Stay on to prevent constant mic restarting and beeping
+    recognition.continuous = false; // Wait for full sentence; fixes text duplication bug
     recognition.interimResults = true; // Enable real-time transcript
     recognition.lang = 'en-US';
 
