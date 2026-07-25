@@ -78,6 +78,46 @@ export async function initFitness() {
     };
   }
   
+  const exportBtn = document.getElementById('btn-export-fitness');
+  if (exportBtn) {
+    exportBtn.onclick = () => {
+      if (!fitnessData || !fitnessData.logs || fitnessData.logs.length === 0) {
+        showToast('No logged data to export yet.', 'error');
+        return;
+      }
+      
+      const target = fitnessData.plan?.nutritionPlan || {};
+      
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Date,Workout Completed,Target Calories,Consumed Calories,Target Protein,Consumed Protein,Target Carbs,Consumed Carbs,Target Fat,Consumed Fat,Notes\n";
+      
+      fitnessData.logs.forEach(log => {
+        const d = new Date(log.date).toLocaleDateString();
+        const workout = log.completedWorkout ? 'Yes' : 'No';
+        const tCals = target.dailyCalories || 0;
+        const cCals = log.caloriesConsumed || 0;
+        const tPro = target.proteinGrams || 0;
+        const cPro = log.proteinConsumed || 0;
+        const tCarbs = target.carbsGrams || 0;
+        const cCarbs = log.carbsConsumed || 0;
+        const tFat = target.fatGrams || 0;
+        const cFat = log.fatConsumed || 0;
+        const notes = log.notes ? `"${log.notes.replace(/"/g, '""')}"` : "";
+        
+        csvContent += `${d},${workout},${tCals},${cCals},${tPro},${cPro},${tCarbs},${cCarbs},${tFat},${cFat},${notes}\n`;
+      });
+      
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "fitness_history.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Export successful!', 'success');
+    };
+  }
+  
   window.addEventListener('ai_refresh_fitness', async () => {
     try {
       const res = await api.getFitnessProfile();
