@@ -12,7 +12,6 @@ export function initAI() {
   const messagesDiv = document.getElementById('ai-chat-messages');
   const micBtn = document.getElementById('ai-chat-mic');
 
-  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   let isListening = false;
   let manualVoice = false;
   let isSpeaking = false;
@@ -106,71 +105,65 @@ export function initAI() {
     }
 
     recognition = new webkitSpeechRecognition();
-    recognition.continuous = true; // Keep mic open to prevent beep loops
+    recognition.continuous = false; // Fixes Android Chrome text duplication bug
     recognition.interimResults = true; // Enable real-time transcript
     recognition.lang = 'en-US';
 
-    let silenceTimer = null;
-    let lastProcessedIndex = 0;
-
     recognition.onstart = () => {
       isListening = true;
-      lastProcessedIndex = 0; // Reset index because event.results is cleared by the browser on new session
       botIcon.style.boxShadow = '0 0 20px rgba(52, 211, 153, 0.6)'; // Green glow when engine active
     };
 
     recognition.onresult = (event) => {
       if (isSpeaking) return; // Prevent AI from listening to its own voice
       
-      let totalTranscript = "";
-      for (let i = lastProcessedIndex; i < event.results.length; ++i) {
-        totalTranscript += event.results[i][0].transcript;
+      let transcript = "";
+      let isFinal = false;
+
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        transcript += event.results[i][0].transcript;
+        if (event.results[i].isFinal) isFinal = true;
       }
-      totalTranscript = totalTranscript.toLowerCase();
+      
+      transcript = transcript.trim().toLowerCase();
+      let foundWakeWord = WAKE_WORDS.find(w => transcript.includes(w));
+      
+      if (foundWakeWord && !wakeWordTriggered) {
+        wakeWordTriggered = true;
+        activateListeningMode();
+        playBeep(); // Instant feedback when wake word is caught
+      } else if (foundWakeWord && wakeWordTriggered) {
+         activateListeningMode();
+      }
 
-      let lastWakeIndex = -1;
-      let usedWakeWord = "";
-      WAKE_WORDS.forEach(w => {
-         let idx = totalTranscript.lastIndexOf(w);
-         if (idx > lastWakeIndex) {
-            lastWakeIndex = idx;
-            usedWakeWord = w;
-         }
-      });
+      // Wake word or manual check
+      if (manualVoice || wakeWordTriggered) {
+        let command = transcript;
+        
+        if (foundWakeWord) {
+          const wakeIndex = transcript.indexOf(foundWakeWord);
+          command = transcript.substring(wakeIndex + foundWakeWord.length).trim();
+        }
+        
+        showOverlay(command || "Listening...", 'listening');
 
-      if (lastWakeIndex !== -1 || manualVoice) {
-         if (lastWakeIndex !== -1 && !wakeWordTriggered) {
-             wakeWordTriggered = true;
-             activateListeningMode();
-             playBeep();
-         }
-
-         let command = "";
-         if (lastWakeIndex !== -1) {
-             command = totalTranscript.substring(lastWakeIndex + usedWakeWord.length).trim();
-         } else {
-             command = totalTranscript.trim();
-         }
-
-         showOverlay(command || "Listening...", 'listening');
-
-         clearTimeout(silenceTimer);
-         silenceTimer = setTimeout(() => {
-            if (command.length > 0) {
-               wakeWordTriggered = false;
-               manualVoice = false;
-               clearTimeout(manualVoiceTimeout);
-               
-               lastProcessedIndex = event.results.length;
-
-               if (botIcon) botIcon.classList.add('ai-processing');
-               showOverlay(command, 'processing');
-               
-               processCommand(command, true);
-            } else {
-               activateListeningMode(); 
-            }
-         }, 1500);
+        if (isFinal) {
+          if (command.length > 0) {
+            wakeWordTriggered = false; // Reset for next sentence
+            manualVoice = false;
+            clearTimeout(manualVoiceTimeout);
+            
+            if (botIcon) botIcon.classList.add('ai-processing');
+            showOverlay(command, 'processing');
+            
+            try { recognition.abort(); } catch(e){} // Stop mic to avoid noise
+            processCommand(command, true);
+          } else {
+            // They said wake word but paused before giving command.
+            // Engine will naturally restart via onend, keep listening mode active.
+            activateListeningMode(); 
+          }
+        }
       }
     };
 
@@ -231,15 +224,6 @@ export function initAI() {
 
     // Browser security blocks mic on load. We start it on the very first click/keypress anywhere on the site.
     const startOnInteraction = () => {
-      // KEEP MIC HOT HACK: Holding a silent audio stream keeps the OS microphone active. 
-      // This prevents Android from forcefully killing SpeechRecognition during silence,
-      // and eliminates the system beep when SpeechRecognition restarts because the mic hardware is already warm.
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-          .then(stream => { window.persistentMicStream = stream; })
-          .catch(e => {});
-      }
-
       if (!isListening) {
         try { 
           recognition.start(); 
