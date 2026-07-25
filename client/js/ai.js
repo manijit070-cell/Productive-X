@@ -12,6 +12,7 @@ export function initAI() {
   const messagesDiv = document.getElementById('ai-chat-messages');
   const micBtn = document.getElementById('ai-chat-mic');
 
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   let isListening = false;
   let manualVoice = false;
   let isSpeaking = false;
@@ -184,6 +185,7 @@ export function initAI() {
       
       // If the AI is currently talking, DO NOT restart the mic (avoids feedback loop)
       if (isSpeaking) return;
+      if (isMobile) return; // Mobile browsers beep on mic start, so disable auto-restart
 
       clearTimeout(restartTimeout);
       restartTimeout = setTimeout(() => {
@@ -217,14 +219,16 @@ export function initAI() {
     }
 
     // Start engine (might fail if no user gesture)
-    try { 
-      recognition.start(); 
-      if (micBtn) micBtn.style.color = 'var(--success-color)';
-    } catch(e){}
+    if (!isMobile) {
+      try { 
+        recognition.start(); 
+        if (micBtn) micBtn.style.color = 'var(--success-color)';
+      } catch(e){}
+    }
 
     // Browser security blocks mic on load. We start it on the very first click/keypress anywhere on the site.
     const startOnInteraction = () => {
-      if (!isListening) {
+      if (!isListening && !isMobile) {
         try { 
           recognition.start(); 
           if (micBtn) micBtn.style.color = 'var(--success-color)';
@@ -237,17 +241,19 @@ export function initAI() {
     document.addEventListener('click', startOnInteraction);
     document.addEventListener('keydown', startOnInteraction);
     
-    // Watchdog Pacemaker to ensure it NEVER stays dead
-    setInterval(() => {
-      if ('webkitSpeechRecognition' in window && !isListening && !isSpeaking) {
-        try { 
-          recognition.start(); 
-        } catch(e) {
-          initSpeechEngine();
-          try { recognition.start(); } catch(e2){}
+    // Watchdog Pacemaker to ensure it NEVER stays dead (Desktop only)
+    if (!isMobile) {
+      setInterval(() => {
+        if ('webkitSpeechRecognition' in window && !isListening && !isSpeaking) {
+          try { 
+            recognition.start(); 
+          } catch(e) {
+            initSpeechEngine();
+            try { recognition.start(); } catch(e2){}
+          }
         }
-      }
-    }, 5000);
+      }, 5000);
+    }
   } else {
     console.warn('Speech recognition not supported in this browser.');
     if (micBtn) micBtn.style.display = 'none';
