@@ -10,16 +10,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  try {
-    // Load User Profile
-    const profileRes = await api.getProfile();
+  // Start profile and dashboard loading in parallel
+  const loadProfilePromise = api.getProfile().then(profileRes => {
     if (profileRes.success) {
       document.getElementById('user-name-display').textContent = profileRes.name;
       document.getElementById('user-avatar').textContent = profileRes.name.charAt(0).toUpperCase();
     }
-  } catch (error) {
+  }).catch(error => {
+    console.error(error);
     showToast('Failed to load profile', 'error');
-  }
+  });
 
   // Navigation Logic
   const navItems = document.querySelectorAll('.nav-item[data-target], .bottom-nav-item[data-target], .mobile-more-item[data-target]');
@@ -131,7 +131,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Initial load
-  loadDashboard();
+  const loadDashboardPromise = loadDashboard();
+
+  // Hide loader once both critical systems are loaded
+  Promise.all([loadProfilePromise, loadDashboardPromise]).then(() => {
+    const loader = document.getElementById('app-loader');
+    if (loader) {
+      loader.classList.add('hidden');
+      setTimeout(() => loader.remove(), 400); // Wait for fade out
+    }
+  });
 
   // Initialize Global AI Assistant
   initAI();
@@ -142,8 +151,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Dashboard logic
 async function loadDashboard() {
   try {
-    const res = await api.getDashboardSummary();
-    const tasksRes = await api.getTasks();
+    const [res, tasksRes] = await Promise.all([
+      api.getDashboardSummary(),
+      api.getTasks()
+    ]);
     if(res.success && tasksRes.success) {
       const data = res.data;
       const tasks = tasksRes.data;
