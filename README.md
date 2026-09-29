@@ -79,9 +79,9 @@ The application will be available at: **http://localhost:5000**
 
 ## 🚀 Deployment Guide
 
-### Backend (Render)
+### Backend (vercel)
 1. Push this repository to GitHub.
-2. Go to [Render](https://render.com/), create a new **Web Service**.
+2. Go to [vercel](https://productive-x-theta.vercel.app/index.html), create a new **Web Service**.
 3. Connect your repository.
 4. Set Build Command to `npm install` and Start Command to `node server/server.js`.
 5. Add your Environment Variables (`MONGO_URI`, `JWT_SECRET`, etc.) in the Render dashboard.
