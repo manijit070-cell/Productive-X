@@ -68,20 +68,7 @@ Navigate to the `ProductiveX` directory where this project is located.
 npm install
 ```
 
-### 4. Environment Variables
-The `.env` file is already created in the root directory. Update it if you want to use MongoDB Atlas:
-
-```env
-NODE_ENV=development
-PORT=5000
-# For local DB:
-MONGO_URI=mongodb://localhost:27017/productiveX
-# For MongoDB Atlas (replace with your URI):
-# MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/productiveX?retryWrites=true&w=majority
-JWT_SECRET=supersecretproductivexkey_change_in_production
-```
-
-### 5. Run the Application
+### 4. Run the Application
 Start the Node.js server (which also serves the frontend static files):
 ```bash
 node server/server.js
