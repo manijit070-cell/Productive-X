@@ -96,10 +96,4 @@ The application will be available at: **http://localhost:5000**
 2. Create a database user and whitelist your IP address (or `0.0.0.0/0` for Render).
 3. Get the connection string and paste it in the `.env` file or Render dashboard.
 
-## 📸 Screenshots
 
-*(Add screenshots here for your B.Tech project documentation)*
-
-- `![Dashboard view](placeholder)`
-- `![Kanban Board](placeholder)`
-- `![Expense Tracker](placeholder)`
