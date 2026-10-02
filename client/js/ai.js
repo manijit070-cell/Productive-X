@@ -315,7 +315,7 @@ export function initAI() {
     } catch (e) {
       document.getElementById(loadingId)?.remove();
       if (botIcon) botIcon.classList.remove('ai-processing');
-      appendChatMessage('assistant', 'Network error reaching the AI.');
+      appendChatMessage('assistant', 'Error: ' + e.message);
       hideOverlay();
     }
     
