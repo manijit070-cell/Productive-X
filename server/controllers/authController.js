@@ -177,6 +177,10 @@ exports.verifyOtp = async (req, res) => {
     });
   } catch (error) {
     console.error('Verify OTP Error:', error);
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(val => val.message);
+      return res.status(400).json({ success: false, message: messages.join(', ') });
+    }
     res.status(500).json({ success: false, message: 'Error verifying OTP' });
   }
 };
