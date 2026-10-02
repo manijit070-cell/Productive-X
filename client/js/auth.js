@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   let currentEmail = '';
   let currentName = '';
+  let currentPassword = '';
   let activeTab = 'login'; // 'login' or 'register'
 
   // Tab Switching logic
@@ -44,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnBack.addEventListener('click', () => showTab(activeTab));
 
   // Common OTP Request Logic
-  const handleOtpRequest = async (email, name, btnId, errorId) => {
+  const handleOtpRequest = async (email, name, password, btnId, errorId) => {
     const errorDiv = document.getElementById(errorId);
     const btn = document.getElementById(btnId);
     const originalText = btn.innerHTML;
@@ -58,6 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (res.success) {
         currentEmail = email;
         currentName = name; // Only set if coming from register tab
+        currentPassword = password; // Only set if providing password
+
         showToast('Login code sent to your email!');
         
         // Hide tabs and initial forms, show OTP form
@@ -77,11 +80,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Login Request
+  // Login Request (OTP)
   formLogin.addEventListener('submit', (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value.trim();
-    handleOtpRequest(email, '', 'btn-login-request', 'login-error');
+    const password = document.getElementById('login-password').value.trim();
+    handleOtpRequest(email, '', password, 'btn-login-request', 'login-error');
+  });
+
+  // Login Request (Password)
+  document.getElementById('btn-login-password').addEventListener('click', async () => {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+    const errorDiv = document.getElementById('login-error');
+    const btn = document.getElementById('btn-login-password');
+    
+    if (!email || !password) {
+      errorDiv.textContent = 'Please enter email and password.';
+      return;
+    }
+    
+    const originalText = btn.innerHTML;
+    errorDiv.textContent = '';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
+    btn.disabled = true;
+
+    try {
+      const res = await api.loginWithPassword(email, password);
+      if (res.success) {
+        api.setToken(res.token);
+        showToast('Login successful!');
+        window.location.href = '/app.html';
+      }
+    } catch (error) {
+      errorDiv.textContent = error.message || 'Invalid credentials.';
+      showToast(error.message, 'error');
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
   });
 
   // Register Request
@@ -89,7 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     const name = document.getElementById('reg-name').value.trim();
     const email = document.getElementById('reg-email').value.trim();
-    handleOtpRequest(email, name, 'btn-reg-request', 'reg-error');
+    const password = document.getElementById('reg-password').value.trim();
+    handleOtpRequest(email, name, password, 'btn-reg-request', 'reg-error');
   });
 
   // Step 2: Verify OTP
@@ -104,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.disabled = true;
 
     try {
-      const res = await api.verifyOtp(currentEmail, otp, currentName);
+      const res = await api.verifyOtp(currentEmail, otp, currentName, currentPassword);
       if (res.success) {
         api.setToken(res.token);
         showToast('Login successful!');

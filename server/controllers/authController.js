@@ -140,7 +140,7 @@ exports.sendOtp = async (req, res) => {
 // @access  Public
 exports.verifyOtp = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { email, otp, name, password } = req.body;
     
     if (!email || !otp) {
       return res.status(400).json({ success: false, message: 'Please provide email and OTP' });
@@ -157,10 +157,14 @@ exports.verifyOtp = async (req, res) => {
     let user = await User.findOne({ email });
     
     if (!user) {
-      user = await User.create({
-        name: email.split('@')[0],
+      const userData = {
+        name: name || email.split('@')[0],
         email: email,
-      });
+      };
+      if (password) {
+        userData.password = password;
+      }
+      user = await User.create(userData);
     }
 
     res.status(200).json({
