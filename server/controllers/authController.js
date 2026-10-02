@@ -181,6 +181,7 @@ exports.verifyOtp = async (req, res) => {
       const messages = Object.values(error.errors).map(val => val.message);
       return res.status(400).json({ success: false, message: messages.join(', ') });
     }
-    res.status(500).json({ success: false, message: 'Error verifying OTP' });
+    // Return 400 with details so Vercel doesn't intercept it with an HTML page
+    res.status(400).json({ success: false, message: 'Server Error: ' + error.message });
   }
 };
