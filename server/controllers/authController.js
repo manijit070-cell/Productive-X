@@ -104,7 +104,7 @@ exports.sendOtp = async (req, res) => {
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Store in DB
-    await Otp.findOneAndDelete({ email });
+    await Otp.deleteMany({ email });
     await Otp.create({ email, otp: otpCode });
 
     console.log(`\n============================`);
@@ -146,13 +146,14 @@ exports.verifyOtp = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide email and OTP' });
     }
 
-    const otpRecord = await Otp.findOne({ email });
+    // Sort by _id descending to get the most recently created OTP if there are duplicates
+    const otpRecord = await Otp.findOne({ email }).sort({ _id: -1 });
     
     if (!otpRecord || otpRecord.otp !== otp) {
       return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
     }
 
-    await Otp.findOneAndDelete({ email });
+    await Otp.deleteMany({ email });
 
     let user = await User.findOne({ email });
     
