@@ -3,7 +3,6 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const mongoSanitize = require('express-mongo-sanitize');
 const connectDB = require('./config/db');
 
 // Load env vars
@@ -25,9 +24,6 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again later.'
 });
 app.use('/api', limiter);
-
-// 3. Prevent NoSQL injection
-app.use(mongoSanitize());
 
 app.use(express.json());
 app.use(cors());
