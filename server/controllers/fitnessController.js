@@ -96,7 +96,7 @@ const generatePlan = async (req, res) => {
 
         const response = await ai.chat.completions.create({
           messages: [{ role: 'user', content: prompt }],
-          model: 'llama3-8b-8192',
+          model: 'qwen/qwen3.8-27b',
           response_format: { type: 'json_object' }
         });
 
@@ -264,7 +264,7 @@ const editPlan = async (req, res) => {
     try {
       const response = await ai.chat.completions.create({
         messages: groqMessages,
-        model: 'llama3-8b-8192',
+        model: 'qwen/qwen3.8-27b',
         response_format: { type: 'json_object' }
       });
 

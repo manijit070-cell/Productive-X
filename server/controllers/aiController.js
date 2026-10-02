@@ -52,7 +52,7 @@ Rules:
     try {
       const response = await ai.chat.completions.create({
         messages: [{ role: 'user', content: prompt }],
-        model: 'llama3-8b-8192',
+        model: 'qwen/qwen3.8-27b',
         response_format: { type: 'json_object' }
       });
 
