@@ -1,8 +1,7 @@
 const User = require('../models/User');
 const Otp = require('../models/Otp');
 const generateToken = require('../utils/generateToken');
-const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
+const nodemailer = require('nodemailer');
 
 // @desc    Register new user
 // @route   POST /api/auth/register
@@ -112,9 +111,17 @@ exports.sendOtp = async (req, res) => {
     console.log(`🔐 OTP for ${email}: ${otpCode}`);
     console.log(`============================\n`);
 
-    if (process.env.RESEND_API_KEY) {
-      await resend.emails.send({
-        from: 'ProductiveX <onboarding@resend.dev>',
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+      });
+
+      await transporter.sendMail({
+        from: `"ProductiveX" <${process.env.EMAIL_USER}>`,
         to: email,
         subject: 'Your ProductiveX Login Code',
         html: `<p>Your secure login code is: <strong>${otpCode}</strong></p><p>This code expires in 5 minutes.</p>`
