@@ -36,11 +36,28 @@
       transition: var(--transition);
     }
     .sidebar-header {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--primary-color);
       margin-bottom: 2rem;
       text-align: center;
+    }
+    .logo-brand {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+      letter-spacing: -1px;
+      text-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+      transition: transform 0.3s ease;
+      cursor: pointer;
+    }
+    .logo-brand:hover {
+      transform: scale(1.05);
     }
     .nav-item {
       padding: 0.75rem 1rem;
@@ -159,7 +176,9 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <i class="fa-solid fa-bolt"></i> Productive X
+        <div class="logo-brand">
+          <i class="fa-solid fa-bolt"></i> Productive X
+        </div>
       </div>
       <nav class="sidebar-nav">
         <div class="nav-item active" data-target="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</div>
