@@ -73,14 +73,38 @@ export function initAI() {
   const siriOverlay = document.getElementById('siri-overlay');
   const siriText = document.getElementById('siri-text');
 
+  let typewriterInterval = null;
+
   function showOverlay(text, state = 'listening') {
     if (!siriOverlay) return;
     siriOverlay.className = `active ${state}`;
-    if (text && siriText) siriText.textContent = text;
+    
+    if (text && siriText) {
+      clearInterval(typewriterInterval);
+      
+      if (state === 'speaking') {
+        siriText.textContent = '';
+        const words = text.split(' ');
+        let i = 0;
+        
+        typewriterInterval = setInterval(() => {
+          if (i < words.length) {
+            siriText.textContent += (i > 0 ? ' ' : '') + words[i];
+            siriText.scrollTop = siriText.scrollHeight; // Auto-scroll to the bottom
+            i++;
+          } else {
+            clearInterval(typewriterInterval);
+          }
+        }, 300); // 300ms per word approximates a normal speaking pace
+      } else {
+        siriText.textContent = text;
+      }
+    }
   }
   
   function hideOverlay() {
     if (siriOverlay) siriOverlay.className = '';
+    clearInterval(typewriterInterval);
   }
 
   // Toggle Chat Panel
