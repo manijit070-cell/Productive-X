@@ -17,6 +17,9 @@ const app = express();
 // 1. Set security HTTP headers (Software Firewall)
 app.use(helmet());
 
+// Enable trust proxy so rate limiter gets the real user IP on Vercel
+app.set('trust proxy', 1);
+
 // 2. Rate limiting (Prevents DDoS and Brute-force attacks)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
