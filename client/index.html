@@ -69,20 +69,40 @@
       </div>
       <p class="auth-subtitle">One Workspace. Every Goal.</p>
 
-      <!-- Step 1: Request OTP Form -->
-      <form id="request-otp-form" class="toggle-form active">
+      <div class="auth-tabs" id="auth-tabs-container">
+        <div class="auth-tab active" id="tab-login">Login</div>
+        <div class="auth-tab" id="tab-register">Register</div>
+      </div>
+
+      <!-- Login Form (Step 1) -->
+      <form id="login-form" class="toggle-form active">
         <div id="login-error" style="color: var(--danger-color); font-size: 0.9rem; margin-bottom: 1rem; text-align: center;"></div>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Enter your email to sign in or create an account securely.</p>
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input type="email" id="login-email" class="form-control" required placeholder="name@example.com">
+          <input type="email" id="login-email" class="form-control" required placeholder="Enter your email">
         </div>
-        <button type="submit" class="btn btn-primary" id="btn-request-otp" style="width: 100%; margin-top: 1rem;">
-          <i class="fa-solid fa-envelope"></i> Send Login Code
+        <button type="submit" class="btn btn-primary" id="btn-login-request" style="width: 100%; margin-top: 1rem;">
+          <i class="fa-solid fa-right-to-bracket"></i> Login with OTP
         </button>
       </form>
 
-      <!-- Step 2: Verify OTP Form -->
+      <!-- Register Form (Step 1) -->
+      <form id="register-form" class="toggle-form">
+        <div id="reg-error" style="color: var(--danger-color); font-size: 0.9rem; margin-bottom: 1rem; text-align: center;"></div>
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="reg-name" class="form-control" required placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" id="reg-email" class="form-control" required placeholder="Enter your email">
+        </div>
+        <button type="submit" class="btn btn-primary" id="btn-reg-request" style="width: 100%; margin-top: 1rem;">
+          <i class="fa-solid fa-user-plus"></i> Register with OTP
+        </button>
+      </form>
+
+      <!-- Verify OTP Form (Step 2 - Shared) -->
       <form id="verify-otp-form" class="toggle-form">
         <div id="verify-error" style="color: var(--danger-color); font-size: 0.9rem; margin-bottom: 1rem; text-align: center;"></div>
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">We've sent a 6-digit secure code to your email.</p>
@@ -91,10 +111,10 @@
           <input type="text" id="login-otp" class="form-control" required placeholder="000000" maxlength="6" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem; font-weight: bold;">
         </div>
         <button type="submit" class="btn btn-primary" id="btn-verify-otp" style="width: 100%; margin-top: 1rem;">
-          <i class="fa-solid fa-shield-check"></i> Verify & Login
+          <i class="fa-solid fa-shield-check"></i> Verify & Continue
         </button>
-        <button type="button" class="btn btn-outline" id="btn-back-to-email" style="width: 100%; margin-top: 0.5rem;" onclick="document.getElementById('verify-otp-form').classList.remove('active'); document.getElementById('request-otp-form').classList.add('active');">
-          Use a different email
+        <button type="button" class="btn btn-outline" id="btn-back-to-email" style="width: 100%; margin-top: 0.5rem;">
+          Go Back
         </button>
       </form>
     </div>

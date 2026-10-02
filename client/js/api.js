@@ -54,7 +54,7 @@ class ApiService {
 
   // Auth
   sendOtp(email) { return this.request('/auth/send-otp', 'POST', { email }); }
-  verifyOtp(email, otp) { return this.request('/auth/verify-otp', 'POST', { email, otp }); }
+  verifyOtp(email, otp, name) { return this.request('/auth/verify-otp', 'POST', { email, otp, name }); }
   getProfile() { return this.request('/auth/profile'); }
 
   // Dashboard
