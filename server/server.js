@@ -1,6 +1,9 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
 const connectDB = require('./config/db');
 
 // Load env vars
@@ -12,6 +15,20 @@ connectDB();
 const app = express();
 
 // Middleware
+// 1. Set security HTTP headers (Software Firewall)
+app.use(helmet());
+
+// 2. Rate limiting (Prevents DDoS and Brute-force attacks)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per window
+  message: 'Too many requests from this IP, please try again later.'
+});
+app.use('/api', limiter);
+
+// 3. Prevent NoSQL injection
+app.use(mongoSanitize());
+
 app.use(express.json());
 app.use(cors());
 
