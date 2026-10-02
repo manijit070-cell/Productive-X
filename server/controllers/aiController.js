@@ -61,7 +61,7 @@ Rules:
       responseJSON = JSON.parse(responseText);
     } catch (aiError) {
       console.error('Groq AI Parse Error:', aiError);
-      return res.status(500).json({ success: false, message: 'AI failed to parse command.' });
+      return res.status(500).json({ success: false, message: 'AI Error: ' + aiError.message });
     }
 
     // Execute backend logic based on intent
@@ -107,6 +107,6 @@ Rules:
 
   } catch (error) {
     console.error('AI Controller Error:', error);
-    res.status(500).json({ success: false, message: 'Server error processing AI command.' });
+    res.status(500).json({ success: false, message: 'Server Error: ' + error.message });
   }
 };

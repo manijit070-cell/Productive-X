@@ -8,66 +8,72 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const tabLogin = document.getElementById('tab-login');
-  const tabRegister = document.getElementById('tab-register');
-  const formLogin = document.getElementById('login-form');
-  const formRegister = document.getElementById('register-form');
+  const formRequestOtp = document.getElementById('request-otp-form');
+  const formVerifyOtp = document.getElementById('verify-otp-form');
+  
+  let currentEmail = '';
 
-  // Toggle Tabs
-  tabLogin.addEventListener('click', () => {
-    tabLogin.classList.add('active');
-    tabRegister.classList.remove('active');
-    formLogin.classList.add('active');
-    formRegister.classList.remove('active');
-  });
-
-  tabRegister.addEventListener('click', () => {
-    tabRegister.classList.add('active');
-    tabLogin.classList.remove('active');
-    formRegister.classList.add('active');
-    formLogin.classList.remove('active');
-  });
-
-  // Login Handle
-  formLogin.addEventListener('submit', async (e) => {
+  // Step 1: Request OTP
+  formRequestOtp.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
+    const email = document.getElementById('login-email').value.trim();
     const errorDiv = document.getElementById('login-error');
+    const btn = document.getElementById('btn-request-otp');
+    
     errorDiv.textContent = '';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+    btn.disabled = true;
 
     try {
-      const res = await api.login(email, password);
+      const res = await api.sendOtp(email);
       if (res.success) {
-        api.setToken(res.token);
-        showToast('Login successful!');
-        setTimeout(() => window.location.href = '/app.html', 1000);
+        currentEmail = email;
+        showToast('Login code sent to your email!');
+        
+        // Switch views
+        formRequestOtp.classList.remove('active');
+        formVerifyOtp.classList.add('active');
+        
+        // Focus OTP input
+        setTimeout(() => document.getElementById('login-otp').focus(), 100);
       }
     } catch (error) {
-      errorDiv.textContent = error.message || 'Invalid email or password.';
+      errorDiv.textContent = error.message || 'Error sending login code.';
       showToast(error.message, 'error');
+    } finally {
+      btn.innerHTML = '<i class="fa-solid fa-envelope"></i> Send Login Code';
+      btn.disabled = false;
     }
   });
 
-  // Register Handle
-  formRegister.addEventListener('submit', async (e) => {
+  // Step 2: Verify OTP
+  formVerifyOtp.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = document.getElementById('reg-name').value;
-    const email = document.getElementById('reg-email').value;
-    const password = document.getElementById('reg-password').value;
-    const errorDiv = document.getElementById('reg-error');
+    const otp = document.getElementById('login-otp').value.trim();
+    const errorDiv = document.getElementById('verify-error');
+    const btn = document.getElementById('btn-verify-otp');
+    
     errorDiv.textContent = '';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
+    btn.disabled = true;
 
     try {
-      const res = await api.register(name, email, password);
+      const res = await api.verifyOtp(currentEmail, otp);
       if (res.success) {
         api.setToken(res.token);
-        showToast('Registration successful!');
+        showToast('Login successful!');
+        
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
+        btn.classList.add('btn-success');
+        
         setTimeout(() => window.location.href = '/app.html', 1000);
       }
     } catch (error) {
-      errorDiv.textContent = error.message || 'Registration failed.';
+      errorDiv.textContent = error.message || 'Invalid or expired code.';
       showToast(error.message, 'error');
+      
+      btn.innerHTML = '<i class="fa-solid fa-shield-check"></i> Verify & Login';
+      btn.disabled = false;
     }
   });
 });

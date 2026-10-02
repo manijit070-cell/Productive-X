@@ -53,8 +53,8 @@ class ApiService {
   }
 
   // Auth
-  login(email, password) { return this.request('/auth/login', 'POST', { email, password }); }
-  register(name, email, password) { return this.request('/auth/register', 'POST', { name, email, password }); }
+  sendOtp(email) { return this.request('/auth/send-otp', 'POST', { email }); }
+  verifyOtp(email, otp) { return this.request('/auth/verify-otp', 'POST', { email, otp }); }
   getProfile() { return this.request('/auth/profile'); }
 
   // Dashboard
