@@ -6,6 +6,7 @@ Productive X is a complete, production-ready SaaS B.Tech project that serves as 
 
 ## 🌟 Features
 
+- **AI Voice Assistant (Sage)**: Built-in voice assistant with wake-word activation ("Sage") for hands-free productivity. Add tasks, track habits, or manage goals using just your voice!
 - **Smart Task Manager (Kanban)**: Drag and drop tasks across To Do, In Progress, Review, and Completed columns.
 - **Expense Tracker**: Keep track of income, expenses, and current balance.
 - **Goal Tracker**: Define goals with deadlines and track percentage progress.
