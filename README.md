@@ -76,7 +76,7 @@ node server/server.js
 ```
 *Alternatively, you can install `nodemon` globally (`npm i -g nodemon`) and run `nodemon server/server.js` for auto-reloading during development.*
 
-The application will be available at: **http://localhost:5000**
+The application will be available at: **https://productive-x-theta.vercel.app/**
 
 ## 🚀 Deployment Guide
 
