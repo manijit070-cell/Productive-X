@@ -1,11 +1,15 @@
 import { api } from './api.js';
 import { showToast } from './components/ui.js';
+import { MotionKit } from './animations.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   if (api.token) {
     window.location.href = '/app.html';
     return;
   }
+
+  const authCard = document.querySelector('.auth-card');
+  if (authCard) MotionKit.pageTransition(authCard);
 
   const tabsContainer = document.getElementById('auth-tabs-container');
   const tabLogin = document.getElementById('tab-login');
@@ -21,9 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentPassword = '';
   let activeTab = 'login'; // 'login' or 'register'
 
-  // Tab Switching logic
+  // Tab Switching logic with Framer Motion
   const showTab = (tab) => {
     activeTab = tab;
+    const targetForm = tab === 'login' ? formLogin : formRegister;
     if (tab === 'login') {
       tabLogin.classList.add('active');
       tabRegister.classList.remove('active');
@@ -37,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     formVerifyOtp.classList.remove('active');
     tabsContainer.style.display = 'flex';
+    MotionKit.pageTransition(targetForm);
   };
 
   tabLogin.addEventListener('click', () => showTab('login'));

@@ -6,19 +6,22 @@
   <title>Productive X - Workspace</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Framer Motion Engine for Web & UI Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/motion@11.11.13/dist/motion.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   
   <!-- CDNs for Overhaul -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 
-  <link rel="stylesheet" href="css/style.css?v=2">
-  <link rel="stylesheet" href="css/components.css?v=2">
+  <link rel="stylesheet" href="css/style.css?v=4">
+  <link rel="stylesheet" href="css/components.css?v=4">
   <style>
     /* Sidebar */
     .sidebar {
@@ -215,37 +218,280 @@
       <main class="content-area">
         <!-- Dashboard Module -->
         <section id="module-dashboard" class="module-section active">
-          <!-- Will be populated by JS -->
-          <div class="grid grid-cols-4 gap-4" style="margin-bottom: 2rem;">
-            <div class="card glass text-center">
-              <h3 style="color: var(--text-muted)">Pending Tasks</h3>
-              <h1 id="dash-pending-tasks">0</h1>
+          <!-- 1. Executive Welcome & Quick Actions Hero -->
+          <div class="dash-hero-card glass motion-card">
+            <div class="dash-hero-content">
+              <div class="dash-greeting-badge">
+                <span class="live-dot"></span>
+                <span id="dash-date-display">Today's Overview</span>
+              </div>
+              <h1 class="dash-hero-title" id="dash-greeting-title">Welcome back, Explorer ✨</h1>
+              <p class="dash-hero-subtitle" id="dash-quote">Transform your ambition into daily progress with focused execution.</p>
+              
+              <!-- Quick Action Bar -->
+              <div class="dash-quick-actions">
+                <button class="dash-action-btn primary" id="dash-quick-task-btn">
+                  <i class="fa-solid fa-plus"></i> New Task
+                </button>
+                <button class="dash-action-btn" id="dash-quick-expense-btn">
+                  <i class="fa-solid fa-receipt"></i> Log Expense
+                </button>
+                <button class="dash-action-btn" id="dash-quick-focus-btn">
+                  <i class="fa-solid fa-stopwatch"></i> Start Focus
+                </button>
+                <button class="dash-action-btn sage" id="dash-quick-sage-btn">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Ask Sage
+                </button>
+              </div>
             </div>
-            <div class="card glass text-center">
-              <h3 style="color: var(--text-muted)">Balance</h3>
-              <h1 id="dash-balance">$0</h1>
-            </div>
-            <div class="card glass text-center">
-              <h3 style="color: var(--text-muted)">Active Goals</h3>
-              <h1 id="dash-active-goals">0</h1>
-            </div>
-            <div class="card glass text-center">
-              <h3 style="color: var(--text-muted)">Habits Tracked</h3>
-              <h1 id="dash-habits-tracked">0</h1>
+
+            <!-- Productivity Health Momentum Widget -->
+            <div class="dash-hero-metric">
+              <div class="productivity-pill">
+                <div class="productivity-radial">
+                  <svg width="74" height="74" viewBox="0 0 74 74">
+                    <circle cx="37" cy="37" r="30" stroke="var(--gauge-track, rgba(255,255,255,0.08))" stroke-width="6" fill="transparent"></circle>
+                    <circle id="dash-score-circle" cx="37" cy="37" r="30" stroke="url(#scoreGrad)" stroke-width="6" fill="transparent"
+                      stroke-dasharray="188.5" stroke-dashoffset="38" stroke-linecap="round"></circle>
+                    <defs>
+                      <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#3b82f6"/>
+                        <stop offset="50%" stop-color="#8b5cf6"/>
+                        <stop offset="100%" stop-color="#10b981"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <span class="radial-value" id="dash-score-value">85%</span>
+                </div>
+                <div class="productivity-info">
+                  <div class="pulse-title">Daily Momentum</div>
+                  <div class="pulse-status" id="dash-score-status"><i class="fa-solid fa-bolt"></i> Peak Flow</div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="card glass">
-              <h3 style="margin-bottom: 1rem;">Task Completion</h3>
-              <div style="position: relative; height: 250px; width: 100%;">
-                <canvas id="taskChart"></canvas>
+
+          <!-- 2. KPI Stat Metric Cards (Staggered Motion Grid) -->
+          <div class="dash-stats-grid">
+            <!-- Card 1: Pending Tasks -->
+            <div class="dash-stat-card glass motion-card card-blue" id="kpi-card-tasks">
+              <div class="stat-top">
+                <span class="stat-label">Pending Tasks</span>
+                <div class="stat-icon-badge blue"><i class="fa-solid fa-list-check"></i></div>
+              </div>
+              <div class="stat-main">
+                <h2 class="stat-value" id="dash-pending-tasks">0</h2>
+                <span class="stat-trend" id="dash-tasks-due-today">Queue on track</span>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill blue" id="dash-tasks-bar" style="width: 0%;"></div>
               </div>
             </div>
-            <div class="card glass">
-              <h3 style="margin-bottom: 1rem;">Expense Distribution</h3>
-              <div style="position: relative; height: 250px; width: 100%;">
+
+            <!-- Card 2: Net Cashflow / Balance -->
+            <div class="dash-stat-card glass motion-card card-emerald" id="kpi-card-balance">
+              <div class="stat-top">
+                <span class="stat-label">Net Balance</span>
+                <div class="stat-icon-badge emerald"><i class="fa-solid fa-wallet"></i></div>
+              </div>
+              <div class="stat-main">
+                <h2 class="stat-value" id="dash-balance">₹0</h2>
+                <div class="stat-tags">
+                  <span class="pill-mini income" id="dash-income-pill"><i class="fa-solid fa-arrow-down"></i> ₹0</span>
+                  <span class="pill-mini expense" id="dash-expense-pill"><i class="fa-solid fa-arrow-up"></i> ₹0</span>
+                </div>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill emerald" id="dash-balance-bar" style="width: 50%;"></div>
+              </div>
+            </div>
+
+            <!-- Card 3: Active Goals -->
+            <div class="dash-stat-card glass motion-card card-violet" id="kpi-card-goals">
+              <div class="stat-top">
+                <span class="stat-label">Active Goals</span>
+                <div class="stat-icon-badge violet"><i class="fa-solid fa-bullseye"></i></div>
+              </div>
+              <div class="stat-main">
+                <h2 class="stat-value" id="dash-active-goals">0</h2>
+                <span class="stat-trend" id="dash-goals-summary">0 In Progress</span>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill violet" id="dash-goals-bar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- Card 4: Daily Habits -->
+            <div class="dash-stat-card glass motion-card card-amber" id="kpi-card-habits">
+              <div class="stat-top">
+                <span class="stat-label">Habits Tracked</span>
+                <div class="stat-icon-badge amber"><i class="fa-solid fa-fire"></i></div>
+              </div>
+              <div class="stat-main">
+                <h2 class="stat-value" id="dash-habits-tracked">0</h2>
+                <span class="stat-trend" id="dash-streak-summary">🔥 Streaks active</span>
+              </div>
+              <div class="stat-bar-track">
+                <div class="stat-bar-fill amber" id="dash-habits-bar" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Interactive Widgets Row: Priority Tasks + Active Goals -->
+          <div class="grid grid-cols-2 gap-4 dash-widgets-row">
+            <!-- Widget 1: Today's Priority Tasks with direct check-off -->
+            <div class="card glass motion-card dash-panel">
+              <div class="dash-panel-header">
+                <div class="panel-title-wrap">
+                  <div class="panel-icon blue"><i class="fa-solid fa-crosshairs"></i></div>
+                  <div>
+                    <h3>Priority Action Items</h3>
+                    <p class="panel-subtitle">Immediate focus list for today</p>
+                  </div>
+                </div>
+                <button class="panel-action-link" id="dash-view-all-tasks">Open Kanban <i class="fa-solid fa-arrow-right"></i></button>
+              </div>
+              <div class="dash-tasks-list" id="dash-priority-tasks-list">
+                <div class="dash-empty-state">
+                  <i class="fa-regular fa-circle-check"></i>
+                  <p>Loading pending tasks...</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Widget 2: Active Goals Roadmap -->
+            <div class="card glass motion-card dash-panel">
+              <div class="dash-panel-header">
+                <div class="panel-title-wrap">
+                  <div class="panel-icon violet"><i class="fa-solid fa-flag-checkered"></i></div>
+                  <div>
+                    <h3>Active Milestones</h3>
+                    <p class="panel-subtitle">High impact targets in progress</p>
+                  </div>
+                </div>
+                <button class="panel-action-link" id="dash-view-all-goals">All Goals <i class="fa-solid fa-arrow-right"></i></button>
+              </div>
+              <div class="dash-goals-list" id="dash-active-goals-list">
+                <div class="dash-empty-state">
+                  <i class="fa-solid fa-bullseye"></i>
+                  <p>Loading active goals...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Interactive Widgets Row: Daily Habits Checklist + Sage AI Productivity Pulse -->
+          <div class="grid grid-cols-2 gap-4 dash-widgets-row">
+            <!-- Widget 3: Today's Habit Check-in -->
+            <div class="card glass motion-card dash-panel">
+              <div class="dash-panel-header">
+                <div class="panel-title-wrap">
+                  <div class="panel-icon amber"><i class="fa-solid fa-calendar-check"></i></div>
+                  <div>
+                    <h3>Daily Rituals & Habits</h3>
+                    <p class="panel-subtitle">Consistency creates excellence</p>
+                  </div>
+                </div>
+                <button class="panel-action-link" id="dash-view-all-habits">Manage Habits <i class="fa-solid fa-arrow-right"></i></button>
+              </div>
+              <div class="dash-habits-list" id="dash-today-habits-list">
+                <div class="dash-empty-state">
+                  <i class="fa-solid fa-fire"></i>
+                  <p>Loading habits tracker...</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Widget 4: Sage AI Daily Pulse -->
+            <div class="card glass motion-card dash-panel sage-briefing-panel">
+              <div class="dash-panel-header">
+                <div class="panel-title-wrap">
+                  <div class="panel-icon sage"><i class="fa-solid fa-brain"></i></div>
+                  <div>
+                    <h3>Sage Productivity Intelligence</h3>
+                    <p class="panel-subtitle">Real-time workflow optimization</p>
+                  </div>
+                </div>
+                <span class="sage-status-chip"><i class="fa-solid fa-wand-magic-sparkles"></i> Active AI</span>
+              </div>
+              <div class="sage-brief-body" id="dash-sage-brief">
+                <div class="sage-quote-box">
+                  <p id="dash-sage-tip">"Review your highest-leverage task first. Completing one difficult goal in the morning sets a winning momentum for the rest of your day."</p>
+                </div>
+                <div class="sage-metrics-summary" id="dash-sage-summary">
+                  <div class="sage-metric-item">
+                    <span class="label">Priority Focus</span>
+                    <span class="val" id="dash-sage-focus-val">Tasks</span>
+                  </div>
+                  <div class="sage-metric-item">
+                    <span class="label">Budget Health</span>
+                    <span class="val text-success" id="dash-sage-finance-val">Balanced</span>
+                  </div>
+                  <div class="sage-metric-item">
+                    <span class="label">Streak Vibe</span>
+                    <span class="val text-warning" id="dash-sage-habit-val">Strong</span>
+                  </div>
+                </div>
+                <div class="sage-cta-row">
+                  <button class="btn btn-primary" id="dash-consult-sage-btn">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Consult Sage AI
+                  </button>
+                  <button class="btn btn-secondary" id="dash-pomo-quick-btn">
+                    <i class="fa-solid fa-play"></i> 25m Sprint
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Analytics Charts Row (Adorable Interactive Doughnut Cards) -->
+          <div class="grid grid-cols-2 gap-4 dash-charts-row">
+            <!-- Adorable Task Doughnut -->
+            <div class="card glass motion-card dash-chart-card cute-chart-card" id="card-task-chart">
+              <div class="dash-chart-header">
+                <div class="flex items-center gap-2">
+                  <span class="chart-header-emoji">🎯</span>
+                  <div>
+                    <h3>Task Execution Pulse</h3>
+                    <p class="panel-subtitle">Interactive pipeline breakdown</p>
+                  </div>
+                </div>
+                <div class="chart-badge-count cute-badge" id="dash-chart-total-tasks">1 Task</div>
+              </div>
+              <div class="chart-canvas-wrapper cute-chart-wrap">
+                <div class="cute-chart-glow blue"></div>
+                <div class="cute-center-hub" id="task-center-hub">
+                  <div class="cute-center-emoji" id="task-center-emoji">🏆</div>
+                  <div class="cute-center-val" id="task-center-val">0</div>
+                  <div class="cute-center-sub" id="task-center-sub">Tasks</div>
+                </div>
+                <canvas id="taskChart"></canvas>
+              </div>
+              <div class="cute-legend-chips" id="task-legend-chips"></div>
+            </div>
+
+            <!-- Adorable Expense Doughnut -->
+            <div class="card glass motion-card dash-chart-card cute-chart-card" id="card-expense-chart">
+              <div class="dash-chart-header">
+                <div class="flex items-center gap-2">
+                  <span class="chart-header-emoji">💎</span>
+                  <div>
+                    <h3>Wealth & Cash Flow</h3>
+                    <p class="panel-subtitle">Income vs outflow harmony</p>
+                  </div>
+                </div>
+                <div class="chart-badge-count cute-badge" id="dash-chart-savings-rate">+100% Margin</div>
+              </div>
+              <div class="chart-canvas-wrapper cute-chart-wrap">
+                <div class="cute-chart-glow emerald"></div>
+                <div class="cute-center-hub" id="expense-center-hub">
+                  <div class="cute-center-emoji" id="expense-center-emoji">🐷</div>
+                  <div class="cute-center-val" id="expense-center-val">₹0</div>
+                  <div class="cute-center-sub" id="expense-center-sub">Net Savings</div>
+                </div>
                 <canvas id="expenseChart"></canvas>
               </div>
+              <div class="cute-legend-chips" id="expense-legend-chips"></div>
             </div>
           </div>
         </section>

@@ -15,7 +15,9 @@ const app = express();
 
 // Middleware
 // 1. Set security HTTP headers (Software Firewall)
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false
+}));
 
 // Enable trust proxy so rate limiter gets the real user IP on Vercel
 app.set('trust proxy', 1);
